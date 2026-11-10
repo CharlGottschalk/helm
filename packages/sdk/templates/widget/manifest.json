@@ -1,0 +1,20 @@
+{
+  "contract": "helm.widget/1",
+  "id": "__ID__",
+  "name": "__NAME__",
+  "version": "0.1.0",
+  "description": "Describe what this widget shows in one sentence.",
+  "category": "Overview",
+  "icon": "pulse",
+  "size": { "w": 2, "h": 3, "minW": 2, "minH": 2 },
+  "multi": false,
+  "settings": [
+    { "id": "limit", "type": "number", "label": "Show at most", "min": 1, "max": 50, "step": 1, "default": 10 }
+  ],
+  "connections": [
+    { "id": "tdt", "kind": "tdt-mcp", "operations": ["tdt_workspace_status"] }
+  ],
+  "permissions": { "write": false },
+  "entry": "index.html",
+  "refresh": { "intervalSeconds": 300 }
+}

@@ -1,0 +1,21 @@
+.picker {
+  flex-shrink: 0;
+  height: 24px;
+  padding: 0 var(--sp-2);
+  font-family: var(--font-mono);
+  font-size: var(--fs-2xs);
+  letter-spacing: var(--tracking-hud);
+  text-transform: uppercase;
+  color: var(--c-text-1);
+  background: var(--c-well);
+  border: 1px solid var(--c-line);
+  border-radius: var(--radius-sm);
+}
+.picker:hover,
+.picker:focus-visible {
+  border-color: var(--c-cyan);
+}
+.picker option {
+  color: var(--c-text-0);
+  background: var(--c-bg-1);
+}

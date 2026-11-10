@@ -1,0 +1,21 @@
+{
+  "contract": "helm.tool/1",
+  "id": "svc-calls",
+  "name": "Service calls (fixture)",
+  "version": "1.0.0",
+  "description": "Calls a declared http service and a declared MCP tool, and renders what comes back as text.",
+  "icon": "link",
+  "entry": "index.html",
+  "connections": [
+    { "id": "svc", "kind": "http", "service": "stub",
+      "calls": {
+        "item": { "method": "GET", "path": "/items/{id}", "query": { "limit": "{limit}", "fixed": "yes" } },
+        "graphql": { "method": "POST", "path": "/graphql", "body": { "query": "query($n: Int) { items(first: $n) { id } }", "variables": { "n": "{n}" } } },
+        "big": { "method": "GET", "path": "/big" },
+        "html": { "method": "GET", "path": "/html" },
+        "away": { "method": "GET", "path": "/redirect" },
+        "status": { "method": "GET", "path": "/status/{code}" }
+      } },
+    { "id": "tools", "kind": "mcp", "server": "stub", "operations": ["echo", "token_seen"] }
+  ]
+}

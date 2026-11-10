@@ -1,0 +1,73 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://helm.local/contracts/connection.schema.json",
+  "title": "Helm connection declarations (v1)",
+  "type": "array",
+  "maxItems": 8,
+  "items": {
+    "oneOf": [
+      { "type": "object", "required": ["id", "kind", "operations"], "additionalProperties": false,
+        "properties": {
+          "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]{0,31}$" },
+          "kind": { "const": "tdt-mcp" },
+          "operations": { "type": "array", "minItems": 1, "items": { "type": "string", "pattern": "^tdt_[a-z_]+$" } }
+        } },
+      { "type": "object", "required": ["id", "kind", "server", "operations"], "additionalProperties": false,
+        "properties": {
+          "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]{0,31}$" },
+          "kind": { "const": "mcp" },
+          "server": { "type": "string", "pattern": "^[a-z0-9][a-z0-9_-]{0,63}$", "description": "Name of an MCP server configured in Helm" },
+          "operations": { "type": "array", "items": { "type": "string" }, "description": "Read tool names the extension may call" },
+          "writes": { "type": "array", "items": { "type": "string" }, "description": "Write tool names; needs permissions.write, and the user confirms every call. Not also in operations" }
+        } },
+      { "type": "object", "required": ["id", "kind", "service", "calls"], "additionalProperties": false,
+        "properties": {
+          "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]{0,31}$" },
+          "kind": { "const": "http" },
+          "service": { "type": "string", "pattern": "^[a-z0-9][a-z0-9_-]{0,63}$", "description": "Service profile configured in Helm (base URL + token)" },
+          "calls": { "type": "object", "minProperties": 1, "maxProperties": 16,
+            "propertyNames": { "pattern": "^[A-Za-z_][A-Za-z0-9_]{0,31}$" },
+            "additionalProperties": { "type": "object", "required": ["method", "path"], "additionalProperties": false,
+              "properties": {
+                "method": { "enum": ["GET", "POST", "PUT", "PATCH", "DELETE"], "description": "Reads: GET, or POST with a declared body (e.g. GraphQL). Writes: POST, PUT, PATCH or DELETE" },
+                "path": { "type": "string", "pattern": "^/(?!/)", "description": "Under the profile's base URL; {name} placeholders filled from args, URL-encoded" },
+                "query": { "type": "object", "additionalProperties": { "type": "string", "maxLength": 1024 }, "description": "Template values; a parameter whose arg is missing is left out" },
+                "body": { "description": "JSON request body; a string that is exactly \"{name}\" becomes that arg" },
+                "write": { "type": "boolean", "description": "A write call: needs permissions.write, and the user confirms every call" }
+              },
+              "if": { "required": ["write"], "properties": { "write": { "const": true } } },
+              "then": { "properties": { "method": { "enum": ["POST", "PUT", "PATCH", "DELETE"] } } },
+              "else": {
+                "properties": { "method": { "enum": ["GET", "POST"] } },
+                "if": { "properties": { "method": { "const": "POST" } } },
+                "then": { "required": ["body"] },
+                "else": { "not": { "required": ["body"] } } } } }
+        } },
+      { "type": "object", "required": ["id", "kind", "root", "paths", "operations"], "additionalProperties": false,
+        "properties": {
+          "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]{0,31}$" },
+          "kind": { "const": "files" },
+          "root": { "enum": ["project", "workspace"], "description": "project: a registered project named per call; workspace: the workspace root" },
+          "paths": { "type": "array", "minItems": 1, "maxItems": 16,
+            "items": { "type": "string", "pattern": "^[A-Za-z0-9_.*?@+-]+(/[A-Za-z0-9_.*?@+-]+)*$" },
+            "description": "Relative globs: * and ? within a segment, a ** segment for any depth; no . or .. segments" },
+          "operations": { "type": "array", "minItems": 1, "items": { "enum": ["list", "read", "write"] }, "description": "write replaces one existing declared file when expected_sha256 matches; needs permissions.write, and the user confirms every call" }
+        } },
+      { "type": "object", "required": ["id", "kind", "service", "engine", "queries"], "additionalProperties": false,
+        "properties": {
+          "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]{0,31}$" },
+          "kind": { "const": "db" },
+          "service": { "type": "string", "pattern": "^[a-z0-9][a-z0-9_-]{0,63}$", "description": "Database profile configured in Helm" },
+          "engine": { "enum": ["sqlite", "postgres", "mysql"], "description": "The profile must use this engine" },
+          "queries": { "type": "object", "minProperties": 1, "maxProperties": 32,
+            "propertyNames": { "pattern": "^[A-Za-z_][A-Za-z0-9_]{0,31}$" },
+            "additionalProperties": { "type": "object", "required": ["sql"], "additionalProperties": false,
+              "properties": {
+                "sql": { "type": "string", "minLength": 1, "maxLength": 16384, "description": "One statement, engine-native positional placeholders" },
+                "params": { "type": "array", "maxItems": 32, "items": { "type": "string", "pattern": "^[A-Za-z_][A-Za-z0-9_]{0,31}$" }, "description": "Call args bound to the placeholders, in order" },
+                "write": { "type": "boolean", "description": "Runs read-write and returns { rowsAffected }; needs permissions.write, and the user confirms every call in Helm" }
+              } } }
+        } }
+    ]
+  }
+}

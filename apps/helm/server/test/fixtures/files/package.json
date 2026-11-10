@@ -1,0 +1,7 @@
+{
+  "name": "helm-fixture-files",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Fixture: a tool that reads software-production tasks through a files connection and parses them itself (task 018).",
+  "helm": { "contract": 1, "tools": ["tools/sp-tasks"] }
+}

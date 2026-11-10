@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://helm.local/contracts/tool.schema.json",
+  "title": "Helm tool manifest (v1)",
+  "type": "object",
+  "required": ["contract", "id", "name", "version", "description", "icon"],
+  "additionalProperties": false,
+  "properties": {
+    "contract": { "const": "helm.tool/1" },
+    "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]{1,63}$" },
+    "name": { "type": "string", "minLength": 1, "maxLength": 60 },
+    "version": { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+(-[0-9A-Za-z.-]+)?$" },
+    "description": { "type": "string", "maxLength": 240 },
+    "icon": { "type": "string" },
+    "multi": { "type": "boolean" },
+    "settings": { "$ref": "settings.schema.json" },
+    "connections": { "$ref": "connection.schema.json" },
+    "capabilities": { "type": "array", "uniqueItems": true, "items": { "enum": ["orchestrate", "terminal", "chat"] } },
+    "permissions": { "type": "object", "additionalProperties": false, "properties": { "write": { "type": "boolean" } } },
+    "entry": { "type": "string", "pattern": "^[A-Za-z0-9._-]+\\.html$" }
+  }
+}

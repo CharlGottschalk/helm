@@ -1,0 +1,12 @@
+{
+  "name": "helm-fixture-scripted",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Fixture: install scripts that must never run.",
+  "scripts": {
+    "preinstall": "node -e \"require('fs').writeFileSync(process.env.HELM_FIXTURE_MARKER || 'ran', 'preinstall')\"",
+    "install": "node -e \"require('fs').writeFileSync(process.env.HELM_FIXTURE_MARKER || 'ran', 'install')\"",
+    "postinstall": "node -e \"require('fs').writeFileSync(process.env.HELM_FIXTURE_MARKER || 'ran', 'postinstall')\""
+  },
+  "helm": { "contract": 1, "widgets": ["widgets/scripted"] }
+}

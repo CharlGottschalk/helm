@@ -1,0 +1,50 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<!-- Theme tokens and the UI kit (docs/kit.md) are injected by Helm; no plugin CSS needed. -->
+</head>
+<body>
+  <div id="app" class="h-state h-state--loading" aria-live="polite">Loading…</div>
+  <script>
+    // `helm` is injected by Helm (typed as HelmBridge in @usetdt/helm-sdk/frame).
+    const app = document.getElementById('app')
+    const el = (tag, cls, ...kids) => { const n = document.createElement(tag); if (cls) n.className = cls; n.append(...kids.map((k) => (k instanceof Node ? k : String(k)))); return n }
+
+    function state(kind, message, action) {
+      app.className = 'h-state' + (kind ? ' h-state--' + kind : '')
+      app.replaceChildren(el('span', '', message))
+      if (action) {
+        const b = el('button', 'h-btn h-btn--ghost', action.label)
+        b.onclick = action.run
+        app.append(b)
+      }
+    }
+
+    async function load() {
+      state('loading', 'Loading…')
+      const r = await helm.call('tdt', 'tdt_workspace_status', {})
+      if (!r.ok) return state('error', r.error ? r.error.message : 'TDT did not answer', { label: 'Retry', run: load })
+      const d = r.data || {}
+      const rows = [['Pending reviews', d.pending_candidates], ['Due reminders', d.due_reminders], ['Projects', d.projects_total]]
+        .filter(([, v]) => v !== undefined && v !== null)
+      if (!rows.length) return state('', 'No workspace numbers yet.')
+      const pending = (d.pending_candidates || 0) + (d.due_reminders || 0)
+      const list = el('ul', 'h-list')
+      for (const [label, value] of rows) {
+        const li = el('li', 'h-row', el('span', 'h-muted', label), el('b', 'h-value', value))
+        list.append(li)
+      }
+      app.className = 'h-stack'
+      app.replaceChildren(
+        el('span', '', el('span', pending ? 'h-badge h-badge--amber' : 'h-badge h-badge--green', pending ? 'Needs you' : 'All clear')),
+        list,
+      )
+    }
+
+    helm.on('settings', load)
+    helm.on('refresh', load)
+    helm.ready()
+  </script>
+</body>
+</html>

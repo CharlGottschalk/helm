@@ -1,0 +1,83 @@
+{
+  "name": "@usetdt/helm",
+  "version": "0.1.0",
+  "description": "Helm: a local Command Deck for ThisDamnThing (TDT) workspaces",
+  "type": "module",
+  "license": "FSL-1.1-ALv2",
+  "homepage": "https://helm.usetdt.com",
+  "keywords": [
+    "helm",
+    "thisdamnthing",
+    "tdt",
+    "command-deck"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "bin": {
+    "helm": "server/bin/helm.js"
+  },
+  "files": [
+    "dist",
+    "server/bin",
+    "server/dist",
+    "contracts"
+  ],
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "dev": "vite",
+    "dev:server": "tsx watch server/src/index.ts --dev",
+    "build": "npm run build:web && npm run build:server && npm run build:contracts",
+    "build:web": "tsc --noEmit && vite build",
+    "build:server": "tsc -p server",
+    "build:contracts": "node -e \"require('node:fs').cpSync('../../packages/sdk/docs','contracts',{recursive:true})\"",
+    "start": "node server/bin/helm.js",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit && tsc -p server --noEmit",
+    "check:plugins": "node server/test/plugins-check.mjs",
+    "check:files": "node server/test/files-check.mjs",
+    "check:db": "node server/test/db-check.mjs",
+    "check:connections": "node server/test/connections-check.mjs",
+    "check:oauth": "node server/test/oauth-check.mjs"
+  },
+  "dependencies": {
+    "@codemirror/commands": "^6.11.1",
+    "@codemirror/lang-markdown": "^6.5.2",
+    "@codemirror/language": "^6.13.1",
+    "@codemirror/state": "^6.7.6",
+    "@codemirror/view": "^6.43.15",
+    "@lezer/highlight": "^1.2.5",
+    "@modelcontextprotocol/sdk": "^1.12.0",
+    "@usetdt/helm-sdk": "^0.2.0",
+    "@xterm/addon-fit": "^0.10.0",
+    "@xterm/xterm": "^5.5.0",
+    "d3-force": "^3.0.0",
+    "mysql2": "^3.24.6",
+    "pg": "^8.23.1",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-markdown": "^9.1.0",
+    "remark-gfm": "^4.0.1",
+    "ws": "^8.18.0",
+    "yaml": "^2.9.1"
+  },
+  "optionalDependencies": {
+    "node-pty": "^1.0.0"
+  },
+  "devDependencies": {
+    "@helm/client": "*",
+    "@helm/ui": "*",
+    "@helm/widgets": "*",
+    "@types/d3-force": "^3.0.10",
+    "@types/node": "^22.10.0",
+    "@types/pg": "^8.23.1",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@types/ws": "^8.5.13",
+    "@vitejs/plugin-react": "^4.3.4",
+    "tsx": "^4.19.2",
+    "vite": "^6.4.5"
+  }
+}

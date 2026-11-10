@@ -1,0 +1,29 @@
+<!doctype html>
+<html>
+<head><meta charset="utf-8" /></head>
+<body>
+  <div id="app" class="h-state h-state--loading" aria-live="polite">Loading…</div>
+  <script>
+    // Rows come back as arrays in column order; render them as text, never as HTML.
+    const app = document.getElementById('app')
+    const el = (tag, cls, ...kids) => { const n = document.createElement(tag); if (cls) n.className = cls; n.append(...kids.map((k) => (k instanceof Node ? k : String(k)))); return n }
+    let engine = 'sqlite'
+
+    async function load() {
+      app.className = 'h-state h-state--loading'
+      app.textContent = 'Loading…'
+      const r = await helm.call(engine, 'items', { minId: 1 })
+      if (!r.ok) return (app.className = 'h-state', app.replaceChildren(el('span', '', r.error.code + ': ' + r.error.message)))
+      const table = el('table', 'h-table',
+        el('thead', '', el('tr', '', ...r.data.columns.map((c) => el('th', '', c)))),
+        el('tbody', '', ...r.data.rows.map((row) => el('tr', '', ...row.map((v) => el('td', '', v === null ? '∅' : v))))))
+      const write = await helm.call(engine, 'write')
+      app.className = 'h-stack'
+      app.replaceChildren(el('span', 'h-muted', engine + ': ' + r.data.rows.length + ' rows'), table,
+        el('span', 'h-muted', 'Write query: ' + (write.ok ? 'ALLOWED (bug)' : write.error.code + ' (' + write.error.message + ')')))
+    }
+    helm.on('settings', (s) => { engine = (s && s.engine) || 'sqlite'; load() })
+    helm.ready()
+  </script>
+</body>
+</html>

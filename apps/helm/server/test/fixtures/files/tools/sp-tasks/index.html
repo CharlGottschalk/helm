@@ -1,0 +1,41 @@
+<!doctype html>
+<html>
+<head><meta charset="utf-8" /></head>
+<body>
+  <div id="app" class="h-state h-state--loading" aria-live="polite">Loading…</div>
+  <script>
+    // The plugin owns the parser: Helm only hands back file text.
+    const app = document.getElementById('app')
+    const el = (tag, cls, ...kids) => { const n = document.createElement(tag); if (cls) n.className = cls; n.append(...kids.map((k) => (k instanceof Node ? k : String(k)))); return n }
+    const field = (text, name) => (text.match(new RegExp('^' + name + ':[ \\t]*(.+)$', 'm')) || [])[1]
+    let project = ''
+
+    async function load() {
+      if (!project) return app.replaceChildren(el('span', '', 'Pick a project in settings.'))
+      const list = await helm.call('sp', 'list', { project })
+      if (!list.ok) return app.replaceChildren(el('span', '', list.error.message))
+      const rows = el('ul', 'h-list')
+      for (const f of list.data.files) {
+        const r = await helm.call('sp', 'read', { project, path: f.path })
+        if (!r.ok) { rows.append(el('li', 'h-row', f.path + ': ' + r.error.message)); continue }
+        const id = f.path.split('/').pop().replace(/\.md$/, '')
+        const title = ((r.data.text.match(/^#\s+(.+)$/m) || [])[1] || id)
+        const status = (field(r.data.text, 'Status') || 'draft').toLowerCase()
+        const li = el('li', 'h-row', el('span', '', title), el('span', 'h-badge', status))
+        if (status === 'ready') {
+          const b = el('button', 'h-btn h-btn--ghost', 'Build')
+          b.onclick = async () => { const res = await helm.orchestrate.build({ projectId: project, taskId: id }); b.textContent = res.ok ? 'Started' : res.error }
+          li.append(b)
+        }
+        rows.append(li)
+      }
+      const probe = await helm.call('sp', 'read', { project, path: 'package.json' })
+      app.className = 'h-stack'
+      app.replaceChildren(el('span', 'h-muted', list.data.files.length + ' task files'), rows,
+        el('span', 'h-muted', 'Undeclared read: ' + (probe.ok ? 'ALLOWED (bug)' : probe.error.code)))
+    }
+    helm.on('settings', (s) => { project = (s && s.projectId) || ''; load() })
+    helm.ready()
+  </script>
+</body>
+</html>

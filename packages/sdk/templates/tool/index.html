@@ -1,0 +1,19 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<!-- Helm injects theme tokens, the UI kit (docs/kit.md) and the bridge before this. -->
+<style>
+  /* Tools fill the tab; leave room for the chat dock. Tokens only (docs/theme.md). */
+  body { padding: var(--sp-5) var(--sp-6) 140px; }
+  h1 { margin: 0 0 var(--sp-4); font-family: var(--font-display); font-weight: var(--display-weight); font-size: var(--fs-2xl); color: var(--c-text-0); }
+  .panel { background: var(--c-surface); border: 1px solid var(--c-line); border-radius: var(--radius); padding: var(--sp-4); }
+</style>
+</head>
+<body>
+  <span class="hud-label">Tool</span>
+  <h1>__NAME__</h1>
+  <div class="panel"><div id="content" class="h-state h-state--loading" aria-live="polite">Loading…</div></div>
+  <script type="module" src="main.js"></script>
+</body>
+</html>

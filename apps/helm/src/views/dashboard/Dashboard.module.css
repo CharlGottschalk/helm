@@ -1,0 +1,293 @@
+.root {
+  position: relative;
+  height: 100%;
+}
+.scroll {
+  height: 100%;
+  overflow-y: auto;
+  padding: var(--sp-6) var(--sp-6) 140px;
+}
+/* ── header ── */
+.header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--sp-6);
+  margin-bottom: var(--sp-5);
+  flex-wrap: wrap;
+}
+.greeting {
+  margin-top: 4px;
+  font-family: var(--font-display);
+  font-size: var(--fs-3xl);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  line-height: 1;
+  color: var(--c-text-0);
+}
+.headerRight {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--sp-6);
+}
+.clock {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+}
+.clockTime {
+  font-family: var(--font-mono);
+  font-size: var(--fs-xl);
+  color: var(--c-cyan);
+  text-shadow: var(--glow-text);
+  letter-spacing: 0.08em;
+}
+.layoutTools {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  padding-left: var(--sp-6);
+  border-left: 1px solid var(--c-line);
+}
+.gridInfo {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-mono);
+  font-size: var(--fs-2xs);
+  letter-spacing: var(--tracking-hud);
+  color: var(--c-text-2);
+}
+.gridInfo > span {
+  width: 5px;
+  height: 5px;
+}
+/* ── grid ── */
+.grid {
+  position: relative;
+  transition: height var(--dur-med) var(--ease-out);
+}
+.cell {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transition:
+    transform var(--dur-med) var(--ease-out),
+    width var(--dur-med) var(--ease-out),
+    height var(--dur-med) var(--ease-out);
+  animation: hud-rise var(--dur-slow) var(--ease-out) both;
+}
+.widget {
+  height: 100%;
+}
+.widget > div:last-child {
+  container-type: inline-size;
+}
+.handle {
+  cursor: grab;
+  user-select: none;
+  touch-action: none;
+}
+.gridActive,
+.gridActive .handle {
+  cursor: grabbing;
+  user-select: none;
+}
+.grip {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  color: var(--c-text-3);
+  transition: color var(--dur-fast);
+}
+.cell:hover .grip {
+  color: var(--c-cyan);
+}
+.dragging {
+  z-index: 30;
+  transition: none;
+  animation: none;
+}
+.dragging > section {
+  border-color: var(--c-line-hot);
+  box-shadow: 0 24px 60px rgb(0 0 0 / 0.6), var(--glow-cyan);
+  opacity: 0.94;
+}
+.resize {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 22px;
+  height: 22px;
+  cursor: nwse-resize;
+  touch-action: none;
+  z-index: 2;
+  opacity: 0.3;
+  transition: opacity var(--dur-fast);
+  background:
+    linear-gradient(135deg, transparent 50%, var(--c-cyan) 50%, var(--c-cyan) 58%, transparent 58%, transparent 70%, var(--c-cyan) 70%, var(--c-cyan) 78%, transparent 78%);
+}
+.cell:hover .resize,
+.dragging .resize {
+  opacity: 1;
+}
+.placeholder {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
+  border: 1px dashed var(--c-cyan);
+  background: repeating-linear-gradient(-45deg, rgb(var(--rgb-accent) / 0.06) 0 6px, transparent 6px 12px);
+  box-shadow: inset 0 0 30px rgb(var(--rgb-accent) / 0.12);
+  transition:
+    transform var(--dur-fast) var(--ease-out),
+    width var(--dur-fast) var(--ease-out),
+    height var(--dur-fast) var(--ease-out);
+}
+.guides span {
+  position: absolute;
+  top: 0;
+  left: 0;
+  border: 1px solid rgb(var(--rgb-accent) / 0.05);
+  pointer-events: none;
+}
+/* -- theme shape hooks: radius, blur and accent-2 per theme -- */
+.placeholder {
+  border-radius: var(--radius);
+}
+.guides span {
+  border-radius: var(--radius-sm);
+}
+.resize {
+  border-radius: 0 0 var(--radius) 0;
+}
+/* -- widget library: remove, highlight, toast, empty deck -- */
+/* hidden (and out of layout, so titles keep their room) until the widget is hovered or focused */
+.removeBtn {
+  display: none;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+  color: var(--c-text-3);
+  border-radius: var(--radius-sm);
+  transition: color var(--dur-fast), background var(--dur-fast);
+}
+.cell:hover .removeBtn,
+.cell:focus-within .removeBtn {
+  display: grid;
+}
+.removeBtn:hover {
+  color: var(--c-red);
+  background: var(--c-red-ghost);
+}
+.configSelect {
+  max-width: 120px;
+  height: 22px;
+  padding: 0 4px;
+  font-size: var(--fs-xs);
+  color: var(--c-text-1);
+  background: var(--c-well);
+  border: 1px solid var(--c-line);
+  border-radius: var(--radius-sm);
+}
+.configSelect option {
+  background: var(--c-bg-1);
+  color: var(--c-text-0);
+}
+.added > section {
+  animation: widget-added 1.6s var(--ease-out);
+}
+@keyframes widget-added {
+  0% { box-shadow: 0 0 0 2px var(--c-cyan), 0 0 40px rgb(var(--rgb-accent) / 0.45); }
+  100% { box-shadow: 0 0 0 0 transparent; }
+}
+.toast {
+  position: absolute;
+  left: 50%;
+  bottom: 96px;
+  z-index: 70;
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  padding: var(--sp-2) var(--sp-2) var(--sp-2) var(--sp-4);
+  min-height: 40px;
+  font-size: var(--fs-md);
+  color: var(--c-text-0);
+  background: var(--c-chrome);
+  border: 1px solid var(--c-line-strong);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-float);
+  backdrop-filter: var(--blur-panel);
+  transform: translateX(-50%);
+  animation: toast-in var(--dur-med) var(--ease-out);
+}
+@keyframes toast-in {
+  from { opacity: 0; transform: translate(-50%, 8px); }
+}
+.toastUndo {
+  height: 26px;
+  padding: 0 var(--sp-3);
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: var(--fs-sm);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--c-cyan);
+  border: 1px solid var(--c-line-strong);
+  border-radius: var(--radius-sm);
+}
+.toastUndo:hover {
+  border-color: var(--c-cyan);
+  background: var(--c-cyan-ghost);
+}
+.emptyDeck {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-3);
+  padding: 12vh var(--sp-6);
+  text-align: center;
+  color: var(--c-text-2);
+  border: 1px dashed var(--c-line-strong);
+  border-radius: var(--radius);
+}
+.emptyDeck > svg {
+  color: var(--c-cyan);
+}
+.emptyDeck h2 {
+  font-family: var(--font-display);
+  font-size: var(--fs-2xl);
+  font-weight: var(--display-weight);
+  color: var(--c-text-0);
+}
+/* -- instance settings -- */
+.settingsBtn {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+  color: var(--c-text-3);
+  border-radius: var(--radius-sm);
+}
+.settingsBtn:hover {
+  color: var(--c-cyan);
+  background: var(--c-surface-hover);
+}
+.configure {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-3);
+  height: 100%;
+  text-align: center;
+  font-size: var(--fs-sm);
+  color: var(--c-text-2);
+}
+.configure > svg {
+  color: var(--c-cyan);
+}

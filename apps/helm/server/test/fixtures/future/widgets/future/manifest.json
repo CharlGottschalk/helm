@@ -1,0 +1,12 @@
+{
+  "contract": "helm.widget/1",
+  "id": "future",
+  "name": "Future fixture",
+  "version": "1.0.0",
+  "description": "Test fixture.",
+  "category": "Utility",
+  "icon": "hex",
+  "size": { "w": 2, "h": 2 },
+  "connections": [{ "id": "tdt", "kind": "tdt-mcp", "operations": ["tdt_workspace_status"] }],
+  "entry": "index.html"
+}

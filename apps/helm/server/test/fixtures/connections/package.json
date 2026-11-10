@@ -1,0 +1,13 @@
+{
+  "name": "helm-fixture-connections",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Fixture: tools that call a declared http service and MCP tools (task 023), and send confirmed writes (task 027).",
+  "helm": {
+    "contract": 1,
+    "tools": [
+      "tools/svc-calls",
+      "tools/svc-writes"
+    ]
+  }
+}

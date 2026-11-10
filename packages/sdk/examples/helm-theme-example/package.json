@@ -1,0 +1,14 @@
+{
+  "name": "helm-theme-example",
+  "version": "1.0.0",
+  "description": "Ember: an example Helm theme plugin (token overrides only)",
+  "keywords": ["helm-plugin"],
+  "license": "Apache-2.0",
+  "files": ["themes"],
+  "helm": {
+    "contract": 1,
+    "themes": ["themes/ember"]
+  },
+  "scripts": { "validate": "helm-sdk validate" },
+  "devDependencies": { "@usetdt/helm-sdk": "^0.2.0" }
+}

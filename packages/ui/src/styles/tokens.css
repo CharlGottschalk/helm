@@ -1,0 +1,155 @@
+/* ───────────────────────────────────────────────────────────
+   HELM DESIGN TOKENS
+   Three layers:
+   1. Primitives  — raw hues (as RGB triplets), fonts, shape, effects.
+                    Each theme overrides these (see themes.css).
+   2. Derived     — the tokens components actually use. Declared on
+                    every [data-theme] element so they recompute for
+                    nested themes (e.g. the live previews in Settings).
+   3. Fixed       — space, type scale, motion, layout. Theme-agnostic.
+   ─────────────────────────────────────────────────────────── */
+
+/* 1 ── Primitives · default theme: HUD ─────────────────────── */
+:root,
+[data-theme='hud'] {
+  /* hues */
+  --rgb-accent: 94 234 255;       /* primary signal */
+  --rgb-accent-2: 94 234 255;     /* frame accents: brackets, markers */
+  --rgb-line: 94 234 255;         /* borders, grids, graph links */
+  --rgb-amber: 255 181 71;
+  --rgb-red: 255 93 115;
+  --rgb-green: 77 255 176;
+  --rgb-violet: 169 147 255;
+  --rgb-blue: 111 157 255;
+
+  /* grounds */
+  --c-void: #02060b;
+  --c-bg-0: #040a12;
+  --c-bg-1: #071320;
+  --c-bg-2: #0b1c2c;
+  --rgb-surface: 8 24 38;
+  --rgb-surface-raised: 13 36 54;
+  --rgb-chrome: 7 19 32;          /* sidebars, tab bar, floating overlays */
+  --rgb-well: 2 8 14;             /* inputs and recessed areas */
+  --surface-alpha: 0.66;
+  --raised-alpha: 0.82;
+  --chrome-alpha: 0.92;
+  --well-alpha: 0.6;
+
+  /* text */
+  --c-text-0: #e8fbff;
+  --c-text-1: #a6c6d2;
+  /* text-2/3 sized for WCAG AA (4.5:1) on the brightest surface they meet: active rows */
+  --c-text-2: #93b1bd;
+  --c-text-3: #7698a5;
+  --c-on-accent: #040a12;
+  --c-accent-hover: #8ff1ff;
+
+  /* type */
+  --font-display: 'Rajdhani', 'Segoe UI', sans-serif;
+  --font-body: 'Inter', 'Segoe UI', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Cascadia Code', Consolas, monospace;
+  --tracking-title: 0.1em;
+  --display-weight: 600;
+
+  /* shape */
+  --radius: 0px;
+  --radius-sm: 0px;
+  --cut-sm: 6px;
+  --cut-md: 10px;
+  --cut-lg: 14px;
+  --skew: -20deg;
+  --bracket: 12px;
+  --bracket-opacity: 1;
+  --shape-identity: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%);
+
+  /* atmosphere */
+  --blur-panel: blur(8px);
+  --rgb-scanline: 255 255 255;
+  --scanline-opacity: 0.018;
+  --aurora-opacity: 0;
+  --panel-header-bg: transparent;
+  --bg-image:
+    radial-gradient(1200px 700px at 70% -10%, rgb(43 159 184 / 0.16), transparent 60%),
+    radial-gradient(900px 600px at -10% 110%, rgb(169 147 255 / 0.08), transparent 60%),
+    linear-gradient(var(--c-bg-0), var(--c-void));
+  --view-enter: hud-rise var(--dur-med) var(--ease-out);
+}
+
+/* 2 ── Derived ─────────────────────────────────────────────── */
+:root,
+[data-theme] {
+  --c-cyan: rgb(var(--rgb-accent));
+  --c-cyan-dim: rgb(var(--rgb-accent) / 0.62);
+  --c-cyan-ghost: rgb(var(--rgb-accent) / 0.1);
+  --c-accent-2: rgb(var(--rgb-accent-2));
+  --c-amber: rgb(var(--rgb-amber));
+  --c-amber-ghost: rgb(var(--rgb-amber) / 0.12);
+  --c-red: rgb(var(--rgb-red));
+  --c-red-ghost: rgb(var(--rgb-red) / 0.12);
+  --c-green: rgb(var(--rgb-green));
+  --c-green-ghost: rgb(var(--rgb-green) / 0.1);
+  --c-violet: rgb(var(--rgb-violet));
+  --c-violet-ghost: rgb(var(--rgb-violet) / 0.12);
+  --c-blue: rgb(var(--rgb-blue));
+  --c-blue-ghost: rgb(var(--rgb-blue) / 0.12);
+
+  --c-surface: rgb(var(--rgb-surface) / var(--surface-alpha));
+  --c-surface-raised: rgb(var(--rgb-surface-raised) / var(--raised-alpha));
+  --c-surface-hover: rgb(var(--rgb-accent) / 0.06);
+  --c-surface-active: rgb(var(--rgb-accent) / 0.11);
+  --c-chrome: rgb(var(--rgb-chrome) / var(--chrome-alpha));
+  --c-well: rgb(var(--rgb-well) / var(--well-alpha));
+
+  --c-line: rgb(var(--rgb-line) / 0.13);
+  --c-line-strong: rgb(var(--rgb-line) / 0.36);
+  --c-line-hot: rgb(var(--rgb-accent) / 0.8);
+  --c-grid: rgb(var(--rgb-line) / 0.035);
+
+  --glow-cyan: 0 0 0 1px rgb(var(--rgb-accent) / 0.25), 0 0 18px rgb(var(--rgb-accent) / 0.16);
+  --glow-amber: 0 0 0 1px rgb(var(--rgb-amber) / 0.3), 0 0 18px rgb(var(--rgb-amber) / 0.16);
+  --glow-accent-2: 0 0 8px rgb(var(--rgb-accent-2) / 0.6);
+  --glow-text: 0 0 10px rgb(var(--rgb-accent) / 0.5);
+  --shadow-float: 0 18px 50px rgb(0 0 0 / 0.55), 0 0 0 1px var(--c-line-strong);
+
+  --clip-cut-sm: polygon(var(--cut-sm) 0, 100% 0, 100% calc(100% - var(--cut-sm)), calc(100% - var(--cut-sm)) 100%, 0 100%, 0 var(--cut-sm));
+  --clip-cut-md: polygon(var(--cut-md) 0, 100% 0, 100% calc(100% - var(--cut-md)), calc(100% - var(--cut-md)) 100%, 0 100%, 0 var(--cut-md));
+  --clip-cut-lg: polygon(var(--cut-lg) 0, 100% 0, 100% calc(100% - var(--cut-lg)), calc(100% - var(--cut-lg)) 100%, 0 100%, 0 var(--cut-lg));
+}
+
+/* 3 ── Fixed ───────────────────────────────────────────────── */
+:root {
+  --fs-2xs: 10px;
+  --fs-xs: 11px;
+  --fs-sm: 12px;
+  --fs-md: 13px;
+  --fs-base: 14px;
+  --fs-lg: 16px;
+  --fs-xl: 20px;
+  --fs-2xl: 28px;
+  --fs-3xl: 40px;
+  --tracking-hud: 0.16em;
+
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-4: 16px;
+  --sp-5: 20px;
+  --sp-6: 24px;
+  --sp-8: 32px;
+  --sp-10: 40px;
+
+  --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --ease-snap: cubic-bezier(0.5, 1.6, 0.4, 1);
+  --dur-fast: 120ms;
+  --dur-med: 220ms;
+  --dur-slow: 420ms;
+
+  --left-w: 260px;
+  --right-w: 300px;
+  --rail-w: 60px;
+  --tabbar-h: 42px;
+  --grid-cols: 6;
+  --grid-row-h: 76px;
+  --grid-gap: 14px;
+}

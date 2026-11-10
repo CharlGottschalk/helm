@@ -1,0 +1,7 @@
+{
+  "name": "helm-fixture-future",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Fixture: a plugin contract this Helm does not support.",
+  "helm": { "contract": 2, "widgets": ["widgets/future"] }
+}

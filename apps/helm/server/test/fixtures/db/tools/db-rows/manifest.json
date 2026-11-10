@@ -1,0 +1,112 @@
+{
+  "contract": "helm.tool/1",
+  "id": "db-rows",
+  "name": "DB rows (fixture)",
+  "version": "1.0.0",
+  "description": "Runs named read-only queries on SQLite, Postgres and MySQL profiles and renders the rows.",
+  "icon": "layers",
+  "settings": [
+    {
+      "id": "engine",
+      "type": "select",
+      "label": "Database",
+      "required": true,
+      "default": "sqlite",
+      "options": [
+        {
+          "value": "sqlite",
+          "label": "SQLite"
+        },
+        {
+          "value": "postgres",
+          "label": "Postgres"
+        },
+        {
+          "value": "mysql",
+          "label": "MySQL"
+        }
+      ]
+    }
+  ],
+  "connections": [
+    {
+      "id": "sqlite",
+      "kind": "db",
+      "service": "fixture-sqlite",
+      "engine": "sqlite",
+      "queries": {
+        "items": {
+          "sql": "SELECT id, name FROM items WHERE id >= ? ORDER BY id",
+          "params": [
+            "minId"
+          ]
+        },
+        "write": {
+          "sql": "INSERT INTO items (name) VALUES ('written by a plugin')"
+        },
+        "ddl": {
+          "sql": "CREATE TABLE plugin_made (a int)"
+        },
+        "many": {
+          "sql": "WITH RECURSIVE c(n) AS (SELECT 1 UNION ALL SELECT n + 1 FROM c WHERE n < 5000) SELECT n FROM c"
+        },
+        "slow": {
+          "sql": "WITH RECURSIVE c(n) AS (SELECT 1 UNION ALL SELECT n + 1 FROM c WHERE n < 1000000000) SELECT count(*) FROM c"
+        }
+      }
+    },
+    {
+      "id": "postgres",
+      "kind": "db",
+      "service": "fixture-postgres",
+      "engine": "postgres",
+      "queries": {
+        "items": {
+          "sql": "SELECT id, name FROM items WHERE id >= $1 ORDER BY id",
+          "params": [
+            "minId"
+          ]
+        },
+        "write": {
+          "sql": "INSERT INTO items (name) VALUES ('written by a plugin')"
+        },
+        "ddl": {
+          "sql": "CREATE TABLE plugin_made (a int)"
+        },
+        "many": {
+          "sql": "SELECT n FROM generate_series(1, 5000) n"
+        },
+        "slow": {
+          "sql": "SELECT pg_sleep(10)"
+        }
+      }
+    },
+    {
+      "id": "mysql",
+      "kind": "db",
+      "service": "fixture-mysql",
+      "engine": "mysql",
+      "queries": {
+        "items": {
+          "sql": "SELECT id, name FROM items WHERE id >= ? ORDER BY id",
+          "params": [
+            "minId"
+          ]
+        },
+        "write": {
+          "sql": "INSERT INTO items (name) VALUES ('written by a plugin')"
+        },
+        "ddl": {
+          "sql": "CREATE TABLE plugin_made (a int)"
+        },
+        "many": {
+          "sql": "WITH RECURSIVE c(n) AS (SELECT 1 UNION ALL SELECT n + 1 FROM c WHERE n < 999) SELECT a.n FROM c a, (SELECT 1 AS x UNION ALL SELECT 2) b"
+        },
+        "slow": {
+          "sql": "SELECT SLEEP(10)"
+        }
+      }
+    }
+  ],
+  "entry": "index.html"
+}

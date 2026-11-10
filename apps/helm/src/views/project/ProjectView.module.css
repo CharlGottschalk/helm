@@ -1,0 +1,324 @@
+.scroll {
+  height: 100%;
+  overflow-y: auto;
+  padding: var(--sp-6) var(--sp-6) 140px;
+}
+
+.hero {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sp-6);
+  margin-bottom: var(--sp-6);
+  padding: var(--sp-6);
+  border: 1px solid var(--c-line);
+  background:
+    linear-gradient(110deg, rgb(var(--rgb-accent) / 0.08), transparent 55%),
+    repeating-linear-gradient(90deg, transparent 0 39px, rgb(var(--rgb-accent) / 0.04) 39px 40px);
+  overflow: hidden;
+}
+.hero::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 0;
+  height: 0;
+  border-top: 28px solid var(--c-cyan);
+  border-left: 28px solid transparent;
+  opacity: 0.8;
+}
+.heroCode {
+  display: grid;
+  place-items: center;
+  width: 88px;
+  height: 88px;
+  flex-shrink: 0;
+  font-family: var(--font-display);
+  font-size: var(--fs-2xl);
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: var(--c-cyan);
+  border: 1px solid var(--c-cyan);
+  background: var(--c-cyan-ghost);
+  box-shadow: var(--glow-cyan);
+  clip-path: var(--shape-identity);
+}
+.heroMain {
+  flex: 1;
+  min-width: 0;
+}
+.name {
+  font-family: var(--font-display);
+  font-size: 48px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  line-height: 1;
+  color: var(--c-text-0);
+  margin: 4px 0 var(--sp-2);
+}
+.desc {
+  max-width: 60ch;
+  color: var(--c-text-1);
+}
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: var(--sp-3);
+}
+.tags span span {
+  width: 5px;
+  height: 5px;
+}
+.heroActions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--grid-gap);
+}
+.span2 {
+  grid-column: span 2;
+}
+@media (min-width: 1900px) {
+  .grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.vitalsBody {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-5);
+}
+.vitalStats {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+  flex: 1;
+}
+.statRow {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 6px;
+  font-size: var(--fs-sm);
+}
+.statNums {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: var(--fs-sm);
+  color: var(--c-text-2);
+}
+.statNums b {
+  font-family: var(--font-display);
+  font-size: var(--fs-lg);
+  color: var(--c-text-0);
+  margin-right: 4px;
+}
+
+.team {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+.team li {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+}
+.avatar {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  font-family: var(--font-display);
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  color: var(--c-amber);
+  border: 1px solid rgb(var(--rgb-amber) / 0.4);
+  background: var(--c-amber-ghost);
+}
+.owner {
+  color: var(--c-on-accent);
+  background: var(--c-amber);
+}
+.personText {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  line-height: 1.3;
+}
+.personName {
+  color: var(--c-text-0);
+  font-size: var(--fs-md);
+}
+.personRole {
+  font-size: var(--fs-sm);
+  color: var(--c-text-2);
+}
+
+.tasks li {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  padding: var(--sp-2) 0;
+  border-bottom: 1px solid var(--c-line);
+  font-size: var(--fs-2xs);
+  color: var(--c-text-3);
+}
+.tasks li:last-child {
+  border-bottom: 0;
+}
+.check {
+  display: grid;
+  place-items: center;
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  border: 1px solid var(--c-line-strong);
+  color: var(--c-on-accent);
+}
+.check:hover {
+  border-color: var(--c-cyan);
+}
+.done .check {
+  background: var(--c-green);
+  border-color: var(--c-green);
+}
+.taskTitle {
+  flex: 1;
+  font-size: var(--fs-md);
+  color: var(--c-text-0);
+}
+.done .taskTitle {
+  color: var(--c-text-3);
+  text-decoration: line-through;
+}
+
+.concepts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: var(--sp-3);
+}
+.notes button {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  width: 100%;
+  padding: var(--sp-2);
+  text-align: left;
+  color: var(--c-text-2);
+  border-bottom: 1px solid var(--c-line);
+}
+.notes li:last-child button {
+  border-bottom: 0;
+}
+.notes button:hover {
+  background: var(--c-surface-hover);
+  color: var(--c-cyan);
+}
+.noteTitle {
+  color: var(--c-text-0);
+  font-size: var(--fs-md);
+  white-space: nowrap;
+}
+.noteExcerpt {
+  flex: 1;
+  min-width: 0;
+  font-size: var(--fs-sm);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.noteTime {
+  font-family: var(--font-mono);
+  font-size: var(--fs-2xs);
+  color: var(--c-text-3);
+}
+.muted {
+  font-size: var(--fs-sm);
+  color: var(--c-text-3);
+}
+.missing {
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: var(--sp-4);
+  height: 100%;
+  color: var(--c-text-2);
+}
+
+/* -- theme shape hooks: radius, blur and accent-2 per theme -- */
+.hero {
+  border-radius: var(--radius);
+  backdrop-filter: var(--blur-panel);
+}
+.hero::after {
+  border-top-color: var(--c-accent-2);
+  opacity: var(--bracket-opacity);
+}
+.avatar {
+  border-radius: var(--radius-sm);
+}
+.check {
+  border-radius: calc(var(--radius-sm) * 0.4);
+}
+/* -- live project (TDT) -- */
+.refs li {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  padding: var(--sp-2);
+  color: var(--c-text-2);
+  border-bottom: 1px solid var(--c-line);
+}
+.refs li:last-child {
+  border-bottom: 0;
+}
+.refs .noteTitle {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: var(--fs-sm);
+}
+.doc {
+  border-bottom: 1px solid var(--c-line);
+}
+.doc summary {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: var(--sp-2);
+  cursor: pointer;
+  color: var(--c-text-0);
+}
+.doc summary:hover {
+  color: var(--c-cyan);
+}
+.docText {
+  max-height: 320px;
+  overflow: auto;
+  margin: 0 0 var(--sp-3);
+  padding: var(--sp-3);
+  font-family: var(--font-mono);
+  font-size: var(--fs-xs);
+  white-space: pre-wrap;
+  color: var(--c-text-1);
+  background: var(--c-well);
+  border-radius: var(--radius-sm);
+}
+.error {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sp-3);
+  font-size: var(--fs-sm);
+  color: var(--c-amber);
+}

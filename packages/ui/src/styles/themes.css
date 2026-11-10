@@ -1,0 +1,347 @@
+/* ───────────────────────────────────────────────────────────
+   THEMES
+   Each theme overrides primitives from tokens.css, plus any derived
+   token it wants to tune. Selectors are bare [data-theme] attributes
+   so a theme can be applied to any subtree (Settings previews).
+   ─────────────────────────────────────────────────────────── */
+
+/* ── GLASS · frosted panels over a drifting aurora ─────────── */
+[data-theme='glass'] {
+  --rgb-accent: 125 230 235;
+  --rgb-accent-2: 196 170 255;
+  --rgb-line: 255 255 255;
+  --rgb-amber: 255 200 120;
+  --rgb-red: 255 120 150;
+  --rgb-green: 120 240 190;
+  --rgb-violet: 196 170 255;
+  --rgb-blue: 140 180 255;
+
+  --c-void: #06071a;
+  --c-bg-0: #0b0d24;
+  --c-bg-1: #15183a;
+  --c-bg-2: #1d2150;
+  /* smoked glass: a dark tint under the frost keeps the aurora from washing out text (WCAG AA) */
+  --rgb-surface: 24 26 64;
+  --rgb-surface-raised: 34 36 80;
+  --rgb-chrome: 12 14 40;
+  --rgb-well: 8 10 30;
+  --surface-alpha: 0.55;
+  --raised-alpha: 0.62;
+  --chrome-alpha: 0.7;
+  --well-alpha: 0.45;
+
+  --c-text-0: #f6f7ff;
+  --c-text-1: #d3d7ef;
+  --c-text-2: #b2b9de;
+  --c-text-3: #8d95bd;
+  --c-on-accent: #0b0d24;
+  --c-accent-hover: #b4f4f6;
+
+  --font-display: 'Sora', 'Segoe UI', sans-serif;
+  --tracking-title: 0.04em;
+  --display-weight: 600;
+
+  --radius: 18px;
+  --radius-sm: 10px;
+  --cut-sm: 0px;
+  --cut-md: 0px;
+  --cut-lg: 0px;
+  --skew: 0deg;
+  --bracket-opacity: 0;
+  --shape-identity: inset(0 round 50%);
+
+  --blur-panel: blur(26px) saturate(170%);
+  --scanline-opacity: 0;
+  --aurora-opacity: 1;
+  --panel-header-bg: linear-gradient(180deg, rgb(255 255 255 / 0.05), transparent);
+  --bg-image:
+    radial-gradient(1000px 700px at 85% -10%, rgb(120 90 255 / 0.35), transparent 60%),
+    radial-gradient(900px 700px at -10% 100%, rgb(40 200 210 / 0.25), transparent 60%),
+    linear-gradient(160deg, #10123a, #070820);
+  --view-enter: glass-in 380ms var(--ease-out);
+
+  /* tuned derived tokens: hairline white edges, soft diffuse glows */
+  --c-cyan-dim: rgb(var(--rgb-accent) / 0.85);
+  --c-line: rgb(255 255 255 / 0.1);
+  --c-line-strong: rgb(255 255 255 / 0.2);
+  --c-surface-hover: rgb(255 255 255 / 0.06);
+  --c-surface-active: rgb(255 255 255 / 0.1);
+  --glow-cyan: 0 0 0 1px rgb(255 255 255 / 0.18), 0 10px 30px rgb(var(--rgb-accent) / 0.18);
+  --glow-accent-2: 0 0 12px rgb(var(--rgb-accent-2) / 0.5);
+  --glow-text: 0 0 24px rgb(var(--rgb-accent) / 0.35);
+  --shadow-float: 0 24px 60px rgb(0 0 0 / 0.45), inset 0 1px 0 rgb(255 255 255 / 0.12), 0 0 0 1px rgb(255 255 255 / 0.12);
+}
+
+@keyframes glass-in {
+  from { opacity: 0; filter: blur(8px); transform: scale(0.985); }
+  to { opacity: 1; filter: none; transform: none; }
+}
+
+/* ── CYBERPUNK · hot magenta frames, electric cyan signal ─── */
+[data-theme='cyber'] {
+  --rgb-accent: 0 240 255;
+  --rgb-accent-2: 255 42 167;
+  --rgb-line: 255 42 167;
+  --rgb-amber: 255 222 0;
+  --rgb-red: 255 51 85;
+  --rgb-green: 57 255 20;
+  --rgb-violet: 190 75 255;
+  --rgb-blue: 0 160 255;
+
+  --c-void: #000000;
+  --c-bg-0: #05010a;
+  --c-bg-1: #0d0418;
+  --c-bg-2: #170a28;
+  --rgb-surface: 16 4 28;
+  --rgb-surface-raised: 26 8 44;
+  --rgb-chrome: 8 2 16;
+  --rgb-well: 0 0 0;
+  --surface-alpha: 0.78;
+  --raised-alpha: 0.9;
+  --chrome-alpha: 0.94;
+  --well-alpha: 0.7;
+
+  --c-text-0: #f6f0ff;
+  --c-text-1: #cdbbe9;
+  /* text-2/3 sized for WCAG AA on the magenta-tinted panel headers */
+  --c-text-2: #b4a2d6;
+  --c-text-3: #9a86bf;
+  --c-on-accent: #05010a;
+  --c-accent-hover: #7ff8ff;
+
+  --font-display: 'Chakra Petch', 'Rajdhani', sans-serif;
+  --tracking-title: 0.12em;
+  --display-weight: 700;
+
+  --radius: 0px;
+  --radius-sm: 0px;
+  --cut-sm: 9px;
+  --cut-md: 14px;
+  --cut-lg: 20px;
+  --skew: -28deg;
+  --bracket: 16px;
+  --bracket-opacity: 1;
+  --shape-identity: polygon(22% 0, 100% 0, 78% 100%, 0 100%);
+
+  --blur-panel: blur(4px);
+  --scanline-opacity: 0.045;
+  --aurora-opacity: 0;
+  --panel-header-bg: linear-gradient(90deg, rgb(255 42 167 / 0.2), rgb(255 42 167 / 0.04) 60%, transparent);
+  --bg-image:
+    radial-gradient(900px 500px at 80% -5%, rgb(255 42 167 / 0.22), transparent 60%),
+    radial-gradient(700px 500px at 0% 100%, rgb(0 240 255 / 0.14), transparent 60%),
+    linear-gradient(rgb(255 42 167 / 0.05) 1px, transparent 1px) 0 0 / 100% 48px,
+    linear-gradient(90deg, rgb(255 42 167 / 0.05) 1px, transparent 1px) 0 0 / 48px 100%,
+    linear-gradient(#08010f, #000);
+  --view-enter: cyber-glitch 420ms steps(1, end);
+
+  --c-line: rgb(255 42 167 / 0.22);
+  --c-line-strong: rgb(255 42 167 / 0.5);
+  --glow-cyan: 0 0 0 1px rgb(var(--rgb-accent) / 0.55), 0 0 24px rgb(var(--rgb-accent) / 0.35);
+  --glow-accent-2: 0 0 12px rgb(var(--rgb-accent-2) / 0.9);
+  --glow-text: 0 0 12px rgb(var(--rgb-accent) / 0.8), 2px 0 0 rgb(255 42 167 / 0.7), -2px 0 0 rgb(0 240 255 / 0.4);
+  --shadow-float: 0 18px 50px rgb(0 0 0 / 0.7), 0 0 0 1px rgb(255 42 167 / 0.6), 0 0 30px rgb(255 42 167 / 0.25);
+}
+
+@keyframes cyber-glitch {
+  0% { opacity: 0; clip-path: inset(40% 0 52% 0); transform: translateX(-8px); }
+  12% { opacity: 1; clip-path: inset(10% 0 70% 0); transform: translateX(6px); filter: hue-rotate(60deg); }
+  24% { clip-path: inset(62% 0 8% 0); transform: translateX(-4px); }
+  36% { clip-path: inset(0 0 85% 0); transform: translateX(3px); filter: none; }
+  48% { clip-path: inset(30% 0 30% 0); transform: translateX(-2px); }
+  60%, 100% { clip-path: inset(0 0 0 0); transform: none; opacity: 1; }
+}
+
+/* ── MONOLITH · clean-room white, charcoal rails, ink signal ──
+   Two halves: 'mono' is the light content area; 'mono-dark' is applied
+   to the rails (sidebars, tab bar, chat dock) on top of it. Anything
+   mono-dark doesn't redefine (fonts, shape) is inherited from mono. */
+[data-theme='mono'] {
+  --rgb-accent: 18 20 24;
+  --rgb-accent-2: 18 20 24;
+  --rgb-line: 18 20 24;
+  /* signal hues darkened to hold 4.5:1 on white */
+  --rgb-amber: 150 84 0;
+  --rgb-red: 186 12 40;
+  --rgb-green: 11 110 67;
+  --rgb-violet: 91 63 196;
+  --rgb-blue: 31 95 209;
+
+  --c-void: #d9dce0;
+  --c-bg-0: #eceef1;
+  --c-bg-1: #f5f6f8;
+  --c-bg-2: #ffffff;
+  --rgb-surface: 255 255 255;
+  --rgb-surface-raised: 255 255 255;
+  --rgb-chrome: 250 250 251;
+  --rgb-well: 236 238 241;
+  --surface-alpha: 0.84;
+  --raised-alpha: 0.96;
+  --chrome-alpha: 0.94;
+  --well-alpha: 0.9;
+
+  --c-text-0: #0d0f12;
+  --c-text-1: #2b2f36;
+  --c-text-2: #474c55;
+  --c-text-3: #5a6069;
+  --c-on-accent: #ffffff;
+  --c-accent-hover: #3a3e46;
+
+  --font-display: 'Oxanium', 'Rajdhani', sans-serif;
+  --tracking-title: 0.12em;
+  --display-weight: 600;
+
+  --radius: 2px;
+  --radius-sm: 2px;
+  --cut-sm: 6px;
+  --cut-md: 10px;
+  --cut-lg: 14px;
+  --skew: 0deg;
+  --bracket: 10px;
+  --bracket-opacity: 1;
+  --shape-identity: polygon(30% 0, 70% 0, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0 70%, 0 30%);
+
+  --blur-panel: blur(10px);
+  --rgb-scanline: 0 0 0;
+  --scanline-opacity: 0.012;
+  --aurora-opacity: 0;
+  --panel-header-bg: linear-gradient(90deg, rgb(18 20 24 / 0.045), transparent 70%);
+  --bg-image:
+    radial-gradient(1100px 700px at 70% -10%, #ffffff, transparent 60%),
+    linear-gradient(rgb(18 20 24 / 0.045) 1px, transparent 1px) 0 0 / 32px 32px,
+    linear-gradient(90deg, rgb(18 20 24 / 0.045) 1px, transparent 1px) 0 0 / 32px 32px,
+    linear-gradient(#f2f3f5, #e3e5e9);
+  --view-enter: mono-scan 460ms var(--ease-out);
+}
+
+[data-theme='mono-dark'] {
+  --rgb-accent: 245 246 248;
+  --rgb-accent-2: 245 246 248;
+  --rgb-line: 255 255 255;
+  --rgb-amber: 255 190 92;
+  --rgb-red: 255 107 125;
+  --rgb-green: 90 230 160;
+  --rgb-violet: 180 160 255;
+  --rgb-blue: 130 170 255;
+
+  --c-bg-0: #15171a;
+  --c-bg-1: #1c1f23;
+  --c-bg-2: #24272c;
+  --rgb-surface: 34 37 42;
+  --rgb-surface-raised: 40 43 49;
+  --rgb-chrome: 24 26 30;
+  --rgb-well: 14 15 18;
+  --surface-alpha: 0.9;
+  --raised-alpha: 0.95;
+  --chrome-alpha: 0.97;
+  --well-alpha: 0.8;
+
+  --c-text-0: #f4f5f7;
+  --c-text-1: #d6d8dc;
+  --c-text-2: #b8bcc3;
+  --c-text-3: #9a9fa8;
+  --c-on-accent: #121418;
+  --c-accent-hover: #ffffff;
+  --rgb-scanline: 255 255 255;
+
+  --c-surface-hover: rgb(255 255 255 / 0.05);
+  --c-surface-active: rgb(255 255 255 / 0.07);
+  --c-line: rgb(255 255 255 / 0.1);
+  --c-line-strong: rgb(255 255 255 / 0.26);
+  --glow-cyan: 0 0 0 1px rgb(255 255 255 / 0.3), 0 0 14px rgb(255 255 255 / 0.08);
+  --glow-accent-2: 0 0 6px rgb(255 255 255 / 0.35);
+  --glow-text: none;
+  /* light shadow: the dock floats over white content, a heavy one greys out text beneath it */
+  --shadow-float: 0 10px 24px rgb(0 0 0 / 0.14), 0 0 0 1px rgb(255 255 255 / 0.14);
+}
+
+/* light half: soft shadows instead of neon glows */
+[data-theme='mono'] {
+  --c-surface-hover: rgb(18 20 24 / 0.04);
+  --c-surface-active: rgb(18 20 24 / 0.07);
+  --c-line: rgb(18 20 24 / 0.12);
+  --c-line-strong: rgb(18 20 24 / 0.3);
+  --c-grid: rgb(18 20 24 / 0.05);
+  --glow-cyan: 0 0 0 1px rgb(18 20 24 / 0.35), 0 4px 14px rgb(18 20 24 / 0.1);
+  --glow-amber: 0 0 0 1px rgb(150 84 0 / 0.4), 0 4px 14px rgb(150 84 0 / 0.1);
+  --glow-accent-2: 0 0 0 0 transparent;
+  --glow-text: none;
+  --shadow-float: 0 20px 50px rgb(18 20 24 / 0.16), 0 0 0 1px var(--c-line-strong);
+}
+
+@keyframes mono-scan {
+  from { opacity: 0.4; clip-path: inset(0 0 100% 0); }
+  to { opacity: 1; clip-path: inset(0 0 0 0); }
+}
+
+/* ── SATIN SLATE · TDT's on-demand UI language, as a Helm theme ──
+   From thisdamnthing/.design-system and resources/ui/tokens.css:
+   no glow, no gradients, satin = 1px top highlight, gold is the one accent,
+   coral the secondary. Geist when installed, system fallbacks otherwise
+   (Geist is bundled locally via @fontsource; see src/styles/fonts.css). */
+[data-theme='satin'] {
+  --rgb-accent: 217 190 85;      /* gold #D9BE55 */
+  --rgb-accent-2: 197 106 78;    /* coral #C56A4E */
+  --rgb-line: 255 255 255;
+  --rgb-amber: 228 206 121;      /* warn #E4CE79 */
+  --rgb-red: 233 161 146;        /* refused #E9A192 */
+  --rgb-green: 165 205 160;      /* pass #A5CDA0 */
+  --rgb-violet: 195 180 240;
+  --rgb-blue: 169 201 222;       /* info #A9C9DE */
+
+  --c-void: #1f1a30;             /* terminal */
+  --c-bg-0: #2a2440;             /* base */
+  --c-bg-1: #342d4e;
+  --c-bg-2: #3f3760;
+  --rgb-surface: 52 45 78;       /* surface #342D4E */
+  --rgb-surface-raised: 63 55 96; /* inset #3F3760 */
+  --rgb-chrome: 36 31 56;        /* rail #241F38 */
+  --rgb-well: 42 36 64;
+  --surface-alpha: 1;
+  --raised-alpha: 1;
+  --chrome-alpha: 1;
+  --well-alpha: 1;
+
+  --c-text-0: #efecf7;           /* chalk */
+  --c-text-1: #d9d5e6;
+  --c-text-2: #b7b0cc;           /* muted */
+  --c-text-3: #a39cbd;           /* lifted from dim #948CAE for AA on surface */
+  --c-on-accent: #241f38;
+  --c-accent-hover: #e5cc6c;
+  --c-graph-index: var(--c-accent-2); /* coral: amber and the accent are both gold here */
+
+  --font-display: 'Geist Sans', 'Geist', 'Inter', system-ui, sans-serif;
+  --font-body: 'Geist Sans', 'Geist', 'Inter', system-ui, sans-serif;
+  --font-mono: 'Geist Mono', ui-monospace, 'Cascadia Code', Consolas, monospace;
+  --tracking-title: 0.02em;
+  --display-weight: 600;
+
+  --radius: 14px;
+  --radius-sm: 8px;
+  --cut-sm: 0px;
+  --cut-md: 0px;
+  --cut-lg: 0px;
+  --skew: 0deg;
+  --bracket-opacity: 0;
+  --shape-identity: inset(0 round 8px);
+
+  --blur-panel: none;
+  --scanline-opacity: 0;
+  --aurora-opacity: 0;
+  --panel-header-bg: transparent;
+  --bg-image: none;
+  --view-enter: hud-rise var(--dur-med) var(--ease-out);
+
+  /* satin, not glow */
+  --c-surface-hover: #4a4270;
+  --c-surface-active: rgb(217 190 85 / 0.12);
+  --c-line: rgb(255 255 255 / 0.09);
+  --c-line-strong: rgb(255 255 255 / 0.18);
+  --c-line-hot: #a9c9de;
+  --c-grid: rgb(255 255 255 / 0.03);
+  --glow-cyan: inset 0 1px 0 rgb(255 255 255 / 0.14), 0 0 0 1px rgb(217 190 85 / 0.6);
+  --glow-amber: inset 0 1px 0 rgb(255 255 255 / 0.14), 0 0 0 1px rgb(228 206 121 / 0.6);
+  --glow-accent-2: none;
+  --glow-text: none;
+  --shadow-float: inset 0 1px 0 rgb(255 255 255 / 0.14), 0 16px 40px rgb(0 0 0 / 0.35), 0 0 0 1px rgb(255 255 255 / 0.12);
+}

@@ -1,0 +1,8 @@
+{
+  "contract": "helm.theme/1",
+  "id": "ember",
+  "name": "Ember",
+  "tagline": "Warm coal panels, a copper signal and soft corners.",
+  "tokens": "tokens.css",
+  "chrome": "chrome.css"
+}

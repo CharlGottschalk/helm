@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://helm.local/contracts/widget.schema.json",
+  "title": "Helm widget manifest (v1)",
+  "type": "object",
+  "required": ["contract", "id", "name", "version", "description", "category", "icon", "size"],
+  "additionalProperties": false,
+  "properties": {
+    "contract": { "const": "helm.widget/1" },
+    "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]{1,63}$" },
+    "name": { "type": "string", "minLength": 1, "maxLength": 60 },
+    "version": { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+(-[0-9A-Za-z.-]+)?$" },
+    "description": { "type": "string", "maxLength": 240 },
+    "category": { "enum": ["Overview", "Work", "Knowledge", "Agents", "Utility"] },
+    "icon": { "type": "string" },
+    "size": {
+      "type": "object", "required": ["w", "h"], "additionalProperties": false,
+      "properties": {
+        "w": { "type": "integer", "minimum": 1, "maximum": 6 },
+        "h": { "type": "integer", "minimum": 1, "maximum": 8 },
+        "minW": { "type": "integer", "minimum": 1, "maximum": 6 },
+        "minH": { "type": "integer", "minimum": 1 },
+        "maxW": { "type": "integer", "minimum": 1, "maximum": 6 },
+        "maxH": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "multi": { "type": "boolean" },
+    "capabilities": { "type": "array", "uniqueItems": true, "items": { "enum": ["orchestrate"] } },
+    "settings": { "$ref": "settings.schema.json" },
+    "connections": { "$ref": "connection.schema.json" },
+    "permissions": { "type": "object", "additionalProperties": false, "properties": { "write": { "type": "boolean" } } },
+    "entry": { "type": "string", "pattern": "^[A-Za-z0-9._-]+\\.html$" },
+    "refresh": { "type": "object", "additionalProperties": false,
+      "properties": { "intervalSeconds": { "type": "integer", "minimum": 30 } } }
+  }
+}

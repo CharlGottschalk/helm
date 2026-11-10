@@ -1,0 +1,18 @@
+{
+  "contract": "helm.tool/1",
+  "id": "sp-tasks",
+  "name": "SP tasks (fixture)",
+  "version": "1.0.0",
+  "description": "Lists a project's software-production tasks via a files connection; Build uses orchestrate.",
+  "icon": "layers",
+  "settings": [
+    { "id": "projectId", "type": "select", "label": "Project", "required": true,
+      "options": { "from": "connection", "connection": "tdt", "call": "tdt_project_list" } }
+  ],
+  "connections": [
+    { "id": "tdt", "kind": "tdt-mcp", "operations": ["tdt_project_list"] },
+    { "id": "sp", "kind": "files", "root": "project", "paths": [".tdt-project/tdt-software-production/tasks/*.md"], "operations": ["list", "read"] }
+  ],
+  "capabilities": ["orchestrate"],
+  "entry": "index.html"
+}

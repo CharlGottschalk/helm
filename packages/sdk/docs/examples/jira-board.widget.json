@@ -1,0 +1,30 @@
+{
+  "contract": "helm.widget/1",
+  "id": "jira-board",
+  "name": "Jira board",
+  "version": "0.1.0",
+  "description": "Open issues on one Jira board, grouped by status.",
+  "category": "Work",
+  "icon": "grid",
+  "size": { "w": 2, "h": 4, "minW": 2, "minH": 3 },
+  "multi": true,
+  "settings": [
+    { "id": "board", "type": "select", "label": "Board", "required": true,
+      "options": { "from": "connection", "connection": "jira", "call": "boards" } },
+    { "id": "columns", "type": "choice", "label": "Columns", "multiple": true,
+      "options": ["To Do", "In Progress", "In Review", "Done"], "default": ["To Do", "In Progress"] },
+    { "id": "mine", "type": "checkbox", "label": "Only issues assigned to me", "default": true },
+    { "id": "limit", "type": "number", "label": "Maximum issues", "min": 1, "max": 100, "step": 1, "default": 20 },
+    { "id": "jql", "type": "text", "label": "Extra JQL filter", "placeholder": "labels = ui", "group": "Advanced" }
+  ],
+  "connections": [
+    { "id": "jira", "kind": "http", "service": "jira",
+      "calls": {
+        "boards": { "method": "GET", "path": "/rest/agile/1.0/board", "map": "values[].{value: to_string(id), label: name}" },
+        "issues": { "method": "GET", "path": "/rest/agile/1.0/board/{board}/issue", "query": { "maxResults": "{limit}", "jql": "{jql}" } }
+      } }
+  ],
+  "permissions": { "write": false },
+  "entry": "index.html",
+  "refresh": { "intervalSeconds": 300 }
+}

@@ -1,0 +1,70 @@
+{
+  "name": "@usetdt/helm-sdk",
+  "version": "0.2.0",
+  "description": "SDK for Helm Command Deck widget and tool plugins: contracts, typed bridge, theme tokens and UI kit",
+  "type": "module",
+  "license": "Apache-2.0",
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "source": "./src/index.ts",
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./frame": {
+      "source": "./src/frame.ts",
+      "types": "./dist/frame.d.ts",
+      "default": "./dist/frame.js"
+    },
+    "./react": {
+      "source": "./src/react.tsx",
+      "types": "./dist/react.d.ts",
+      "default": "./dist/react.js"
+    },
+    "./docs/*": "./docs/*",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "bin",
+    "dist",
+    "docs",
+    "src",
+    "templates"
+  ],
+  "keywords": [
+    "helm",
+    "helm-plugin",
+    "thisdamnthing",
+    "tdt"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc --noEmit",
+    "check": "node test/check.mjs"
+  },
+  "bin": {
+    "helm-sdk": "bin/helm-sdk.js"
+  },
+  "dependencies": {
+    "esbuild": "^0.25.12"
+  },
+  "peerDependencies": {
+    "react": ">=18",
+    "react-dom": ">=18"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    },
+    "react-dom": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1"
+  }
+}

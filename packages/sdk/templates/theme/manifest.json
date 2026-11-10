@@ -1,0 +1,7 @@
+{
+  "contract": "helm.theme/1",
+  "id": "__ID__",
+  "name": "__NAME__",
+  "tagline": "One line that describes the look.",
+  "tokens": "tokens.css"
+}

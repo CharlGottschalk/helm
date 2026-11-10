@@ -1,0 +1,19 @@
+{
+  "contract": "helm.tool/1",
+  "id": "__ID__",
+  "name": "__NAME__",
+  "version": "0.1.0",
+  "description": "Describe the job this tool does in one sentence.",
+  "icon": "grid",
+  "multi": true,
+  "settings": [
+    { "id": "project", "type": "select", "label": "Project", "required": true,
+      "options": { "from": "connection", "connection": "tdt", "call": "tdt_project_list" } }
+  ],
+  "connections": [
+    { "id": "tdt", "kind": "tdt-mcp", "operations": ["tdt_project_list", "tdt_project_read"] }
+  ],
+  "capabilities": [],
+  "permissions": { "write": false },
+  "entry": "index.html"
+}

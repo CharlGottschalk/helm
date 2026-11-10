@@ -1,0 +1,4 @@
+/* Ember rails: the sidebars, tab bar and chat dock sit a step darker than the panels. */
+--rgb-chrome: 14 9 5;
+--chrome-alpha: 0.96;
+--c-text-1: #e6d4bf;

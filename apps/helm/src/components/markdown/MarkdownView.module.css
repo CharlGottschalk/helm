@@ -1,0 +1,129 @@
+.md {
+  font-size: var(--fs-base);
+  line-height: 1.7;
+  color: var(--c-text-1);
+  overflow-wrap: anywhere;
+}
+.md > :first-child {
+  margin-top: 0;
+}
+.md h1,
+.md h2,
+.md h3,
+.md h4 {
+  margin: 1.4em 0 0.5em;
+  font-family: var(--font-display);
+  font-weight: var(--display-weight);
+  line-height: 1.25;
+  color: var(--c-text-0);
+}
+.md h1 {
+  font-size: var(--fs-2xl);
+}
+.md h2 {
+  font-size: var(--fs-xl);
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--c-line);
+}
+.md h3 {
+  font-size: var(--fs-lg);
+}
+.md p,
+.md ul,
+.md ol,
+.md table,
+.md pre,
+.md blockquote {
+  margin: 0 0 1em;
+}
+.md ul,
+.md ol {
+  padding-left: 1.4em;
+}
+/* the global reset removes list markers; restore them for prose */
+.md ul {
+  list-style: disc;
+}
+.md ol {
+  list-style: decimal;
+}
+.md ul ul {
+  list-style: circle;
+}
+.md li:has(> input[type='checkbox']) {
+  list-style: none;
+  margin-left: -1.2em;
+}
+.md li + li {
+  margin-top: 0.25em;
+}
+.md li::marker {
+  color: var(--c-cyan);
+}
+.md strong {
+  color: var(--c-text-0);
+}
+.md a {
+  color: var(--c-cyan);
+}
+.md code {
+  padding: 1px 6px;
+  font-family: var(--font-mono);
+  font-size: 0.9em;
+  color: var(--c-green);
+  background: var(--c-well);
+  border: 1px solid var(--c-line);
+  border-radius: var(--radius-sm);
+}
+.md pre {
+  padding: var(--sp-3) var(--sp-4);
+  overflow-x: auto;
+  background: var(--c-well);
+  border: 1px solid var(--c-line);
+  border-radius: var(--radius-sm);
+}
+.md pre code {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--c-text-0);
+}
+.md blockquote {
+  padding-left: var(--sp-4);
+  color: var(--c-text-2);
+  border-left: 2px solid var(--c-accent-2);
+}
+.md table {
+  border-collapse: collapse;
+  font-size: var(--fs-md);
+}
+.md th,
+.md td {
+  padding: 6px 10px;
+  border: 1px solid var(--c-line);
+  text-align: left;
+}
+.md th {
+  color: var(--c-text-0);
+  background: var(--c-surface-hover);
+}
+.md hr {
+  border: 0;
+  border-top: 1px solid var(--c-line-strong);
+}
+.md input[type='checkbox'] {
+  accent-color: var(--c-cyan);
+}
+.wikilink {
+  display: inline;
+  padding: 0 3px;
+  font: inherit;
+  color: var(--c-cyan);
+  background: var(--c-cyan-ghost);
+  border-bottom: 1px dashed rgb(var(--rgb-accent) / 0.6);
+  border-radius: 2px;
+  cursor: pointer;
+}
+.wikilink:hover {
+  background: rgb(var(--rgb-accent) / 0.2);
+}

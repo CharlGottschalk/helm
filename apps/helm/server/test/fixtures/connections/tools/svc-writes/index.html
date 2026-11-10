@@ -1,0 +1,26 @@
+<!doctype html>
+<html>
+<head><meta charset="utf-8" /></head>
+<body>
+  <p>
+    <button id="patch" class="h-btn">PATCH item 7</button>
+    <button id="bump" class="h-btn">MCP bump</button>
+    <button id="note" class="h-btn">Mark note done</button>
+  </p>
+  <div id="out" aria-live="polite"></div>
+  <script>
+    // Results are untrusted data: render as text only.
+    const out = document.getElementById('out')
+    const show = (label, r) => { const p = document.createElement('p'); p.textContent = label + ': ' + (r.ok ? JSON.stringify(r.data) : r.error.code + ' ' + r.error.message); out.prepend(p) }
+    document.getElementById('patch').onclick = async () => show('update', await helm.call('svc', 'update', { id: 7, state: 'closed' }))
+    document.getElementById('bump').onclick = async () => show('bump', await helm.call('tools', 'bump', { by: 2 }))
+    document.getElementById('note').onclick = async () => {
+      const r = await helm.call('notes', 'read', { path: 'notes/todo.md' })
+      if (!r.ok) return show('read', r)
+      const text = r.data.text.replace(/^Status: .*$/m, 'Status: done')
+      show('write', await helm.call('notes', 'write', { path: 'notes/todo.md', text, expected_sha256: r.data.sha256 }))
+    }
+    helm.ready()
+  </script>
+</body>
+</html>

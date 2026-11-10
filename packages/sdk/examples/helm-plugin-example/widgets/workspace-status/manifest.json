@@ -1,0 +1,17 @@
+{
+  "contract": "helm.widget/1",
+  "id": "workspace-status",
+  "name": "Workspace status",
+  "version": "0.1.0",
+  "description": "Pending reviews, due reminders and projects, built only on the Helm SDK UI kit.",
+  "category": "Overview",
+  "icon": "pulse",
+  "size": { "w": 2, "h": 3, "minW": 2, "minH": 2 },
+  "multi": false,
+  "connections": [
+    { "id": "tdt", "kind": "tdt-mcp", "operations": ["tdt_workspace_status"] }
+  ],
+  "permissions": { "write": false },
+  "entry": "index.html",
+  "refresh": { "intervalSeconds": 300 }
+}

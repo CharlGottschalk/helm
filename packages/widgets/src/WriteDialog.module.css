@@ -1,0 +1,85 @@
+/* Helm's write confirmation dialog: same overlay and panel as the record edit confirmation. */
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 900;
+  display: grid;
+  place-items: center;
+  padding: var(--sp-6);
+  background: rgb(0 0 0 / 0.5);
+  backdrop-filter: blur(4px);
+}
+.dialog {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+  width: min(620px, 100%);
+  max-height: min(760px, 100%);
+  overflow: auto;
+  padding: var(--sp-5);
+  background: var(--c-chrome);
+  border: 1px solid var(--c-line-strong);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-float);
+  animation: hud-rise var(--dur-med) var(--ease-out);
+}
+.title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--fs-xl);
+  font-weight: var(--display-weight);
+  letter-spacing: var(--tracking-title);
+  text-transform: uppercase;
+  color: var(--c-text-0);
+}
+.text {
+  margin: 0;
+  font-size: var(--fs-md);
+  color: var(--c-text-0);
+  overflow-wrap: anywhere;
+}
+.detail {
+  display: grid;
+  gap: var(--sp-1);
+  margin: 0;
+}
+.detail dd {
+  margin: 0 0 var(--sp-2);
+}
+.code {
+  margin: 0;
+  max-height: 240px;
+  overflow: auto;
+  padding: var(--sp-2) var(--sp-3);
+  font-family: var(--font-mono);
+  font-size: var(--fs-sm);
+  line-height: 1.5;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  color: var(--c-text-0);
+  background: var(--c-well);
+  border: 1px solid var(--c-line);
+  border-radius: var(--radius-sm);
+}
+.warn {
+  margin: 0;
+  font-size: var(--fs-sm);
+  color: var(--c-text-1);
+}
+.foot {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--sp-2);
+}
+/* file diffs: the - / + marker carries the meaning; the tint only helps scanning */
+.ctx,
+.del,
+.add {
+  display: block;
+}
+.del {
+  background: var(--c-red-ghost);
+}
+.add {
+  background: var(--c-green-ghost);
+}

@@ -1,0 +1,26 @@
+{
+  "name": "helm-monorepo",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "license": "FSL-1.1-ALv2",
+  "packageManager": "npm@11.19.0",
+  "engines": {
+    "node": ">=24"
+  },
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "turbo run dev",
+    "dev:server": "turbo run dev:server",
+    "build": "turbo run build",
+    "typecheck": "turbo run typecheck",
+    "start": "npm start -w @usetdt/helm"
+  },
+  "devDependencies": {
+    "turbo": "^2.11.10",
+    "typescript": "^5.6.3"
+  }
+}

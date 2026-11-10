@@ -1,0 +1,103 @@
+{
+  "contract": "helm.tool/1",
+  "id": "db-writes",
+  "name": "DB writes (fixture)",
+  "version": "1.0.0",
+  "description": "Renames a row through a declared write query; Helm confirms every call.",
+  "icon": "layers",
+  "settings": [
+    {
+      "id": "engine",
+      "type": "select",
+      "label": "Database",
+      "required": true,
+      "default": "sqlite",
+      "options": [
+        {
+          "value": "sqlite",
+          "label": "SQLite"
+        },
+        {
+          "value": "postgres",
+          "label": "Postgres"
+        },
+        {
+          "value": "mysql",
+          "label": "MySQL"
+        }
+      ]
+    }
+  ],
+  "permissions": {
+    "write": true
+  },
+  "connections": [
+    {
+      "id": "sqlite",
+      "kind": "db",
+      "service": "fixture-sqlite",
+      "engine": "sqlite",
+      "queries": {
+        "items": {
+          "sql": "SELECT id, name FROM items WHERE id >= ? ORDER BY id",
+          "params": [
+            "minId"
+          ]
+        },
+        "rename": {
+          "sql": "UPDATE items SET name = ? WHERE id = ?",
+          "params": [
+            "name",
+            "id"
+          ],
+          "write": true
+        }
+      }
+    },
+    {
+      "id": "postgres",
+      "kind": "db",
+      "service": "fixture-postgres",
+      "engine": "postgres",
+      "queries": {
+        "items": {
+          "sql": "SELECT id, name FROM items WHERE id >= $1 ORDER BY id",
+          "params": [
+            "minId"
+          ]
+        },
+        "rename": {
+          "sql": "UPDATE items SET name = $1 WHERE id = $2",
+          "params": [
+            "name",
+            "id"
+          ],
+          "write": true
+        }
+      }
+    },
+    {
+      "id": "mysql",
+      "kind": "db",
+      "service": "fixture-mysql",
+      "engine": "mysql",
+      "queries": {
+        "items": {
+          "sql": "SELECT id, name FROM items WHERE id >= ? ORDER BY id",
+          "params": [
+            "minId"
+          ]
+        },
+        "rename": {
+          "sql": "UPDATE items SET name = ? WHERE id = ?",
+          "params": [
+            "name",
+            "id"
+          ],
+          "write": true
+        }
+      }
+    }
+  ],
+  "entry": "index.html"
+}

@@ -1,0 +1,23 @@
+/* __NAME__: token overrides (docs/theme.md#theme-plugins). Only --token: value; lines.
+   Tokens that you do not set keep their Holographic HUD values. */
+--rgb-accent: 255 170 80;
+--rgb-accent-2: 255 170 80;
+--rgb-line: 255 170 80;
+
+--c-void: #0a0603;
+--c-bg-0: #120b05;
+--c-bg-1: #1c120a;
+--c-bg-2: #26190e;
+--rgb-surface: 32 21 12;
+--rgb-surface-raised: 44 30 18;
+--rgb-chrome: 24 16 9;
+
+--c-text-0: #fff6ec;
+--c-text-1: #e0cdb8;
+--c-text-2: #c8b39c;
+--c-text-3: #ad9780;
+--c-on-accent: #120b05;
+--c-accent-hover: #ffc58a;
+
+--radius: 6px;
+--radius-sm: 4px;

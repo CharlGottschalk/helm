@@ -1,0 +1,34 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://usetdt.com/schemas/helm/plugin.schema.json",
+  "title": "Helm plugin package.json (contract 1)",
+  "type": "object",
+  "required": ["name", "version", "helm"],
+  "properties": {
+    "name": { "type": "string", "minLength": 1 },
+    "version": { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+(-[0-9A-Za-z.-]+)?$" },
+    "helm": {
+      "type": "object",
+      "required": ["contract"],
+      "additionalProperties": false,
+      "properties": {
+        "contract": { "const": 1 },
+        "widgets": { "$ref": "#/$defs/dirs" },
+        "tools": { "$ref": "#/$defs/dirs" },
+        "themes": { "$ref": "#/$defs/dirs" }
+      },
+      "anyOf": [
+        { "required": ["widgets"], "properties": { "widgets": { "minItems": 1 } } },
+        { "required": ["tools"], "properties": { "tools": { "minItems": 1 } } },
+        { "required": ["themes"], "properties": { "themes": { "minItems": 1 } } }
+      ]
+    }
+  },
+  "$defs": {
+    "dirs": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": { "type": "string", "pattern": "^[A-Za-z0-9_-]+(/[A-Za-z0-9_.-]+)*$", "not": { "pattern": "(^|/)\\.\\.?(/|$)" } }
+    }
+  }
+}

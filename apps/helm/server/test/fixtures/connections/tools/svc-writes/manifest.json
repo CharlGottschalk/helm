@@ -1,0 +1,20 @@
+{
+  "contract": "helm.tool/1",
+  "id": "svc-writes",
+  "name": "Service writes (fixture)",
+  "version": "1.0.0",
+  "description": "Sends declared http, mcp and files writes; Helm confirms each one. Renders results as text.",
+  "icon": "link",
+  "entry": "index.html",
+  "permissions": { "write": true },
+  "connections": [
+    { "id": "svc", "kind": "http", "service": "stub",
+      "calls": {
+        "item": { "method": "GET", "path": "/items/{id}" },
+        "update": { "method": "PATCH", "path": "/items/{id}", "body": { "state": "{state}", "note": "{ literal }" }, "write": true },
+        "remove": { "method": "DELETE", "path": "/items/{id}", "write": true }
+      } },
+    { "id": "tools", "kind": "mcp", "server": "stub", "operations": ["echo"], "writes": ["bump"] },
+    { "id": "notes", "kind": "files", "root": "workspace", "paths": ["notes/*.md"], "operations": ["read", "write"] }
+  ]
+}

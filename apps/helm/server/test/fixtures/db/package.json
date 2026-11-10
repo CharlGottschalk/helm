@@ -1,0 +1,7 @@
+{
+  "name": "helm-fixture-db",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Fixture: a tool that runs named read-only queries through db connections on SQLite, Postgres and MySQL (task 019).",
+  "helm": { "contract": 1, "tools": ["tools/db-rows"] }
+}
