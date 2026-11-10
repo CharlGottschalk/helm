@@ -77,8 +77,11 @@ change. Click **Cancel** to refuse it. There is no option to allow all writes.
 It reads internal tasks, and tasks from Linear and GitHub through service profiles
 named `linear` and `github`. See [Connections](connections.md).
 
-The plugin is not published to npm yet. To install it from its repository:
+To install it:
 
-1. In the plugin folder, run `npm install` and `npm run build`.
-2. Run `helm plugin link .`.
-3. Approve and enable it in **System settings** → **Plugins**.
+1. Run `helm plugin add helm-plugin-software-production`, or enter that name in
+   **System settings** → **Plugins** → **Install**.
+2. Approve and enable it in **System settings** → **Plugins**.
+
+The source is at
+[github.com/CharlGottschalk/helm-plugin-software-production](https://github.com/CharlGottschalk/helm-plugin-software-production).
