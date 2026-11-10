@@ -4,6 +4,13 @@
   "description": "SDK for Helm Command Deck widget and tool plugins: contracts, typed bridge, theme tokens and UI kit",
   "type": "module",
   "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CharlGottschalk/helm.git",
+    "directory": "packages/sdk"
+  },
+  "bugs": "https://github.com/CharlGottschalk/helm/issues",
+  "homepage": "https://helm.usetdt.com/docs/sdk",
   "sideEffects": false,
   "exports": {
     ".": {

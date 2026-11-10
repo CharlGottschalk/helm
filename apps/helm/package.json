@@ -4,6 +4,12 @@
   "description": "Helm: a local Command Deck for ThisDamnThing (TDT) workspaces",
   "type": "module",
   "license": "FSL-1.1-ALv2",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CharlGottschalk/helm.git",
+    "directory": "apps/helm"
+  },
+  "bugs": "https://github.com/CharlGottschalk/helm/issues",
   "homepage": "https://helm.usetdt.com",
   "keywords": [
     "helm",

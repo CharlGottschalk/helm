@@ -1,5 +1,8 @@
 # Helm: Command Deck for ThisDamnThing
 
+> **Beta.** Helm and its SDK are in beta (0.x). Expect bugs, and changes between versions.
+> Report problems in [GitHub issues](https://github.com/CharlGottschalk/helm/issues).
+
 Helm is a local Command Deck for [ThisDamnThing](https://usetdt.com) (TDT) workspaces.
 It has themes, and it shows a dashboard of widgets, tabbed tools, a brain graph, agent
 sessions and a workspace terminal. Helm is a separate npm package. It runs a server
