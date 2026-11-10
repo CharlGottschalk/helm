@@ -51,9 +51,8 @@ helm plugin list                                # show installed plugins
 After `add` or `link`, approve and enable the plugin in **System settings** →
 **Plugins**.
 
-Helm is not on npm yet, so `helm` is usually not on your `PATH`. After
-`npm run build`, run the commands from the Helm repository root as `npx helm …`, for
-example `npx helm plugin list`.
+The `helm` command is on your `PATH` after `npm install -g @usetdt/helm`. If you run
+Helm from its source code, run the commands from the repository root as `npx helm …`.
 
 ## Uninstall a plugin
 

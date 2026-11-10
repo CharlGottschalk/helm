@@ -44,12 +44,14 @@ workspace as [Getting started](getting-started.md#add-a-workspace) describes.
 
 ## Install scripts
 
-npm 11 can skip the install scripts of esbuild and node-pty. In tests, the build still
-worked without them. If the build fails, or terminals are not available, do these steps:
+npm 11 can skip the install scripts of esbuild and node-pty. Helm works without them,
+except the workspace terminal on Linux: node-pty has no prebuilt binary for Linux, so
+it must run its install script.
 
-1. Review the install scripts of the two packages.
-2. Run `npm approve-scripts esbuild node-pty`.
-3. Run `npm install` again.
+- For a global install, install again with
+  `npm install -g @usetdt/helm --allow-scripts=node-pty`.
+- For a source checkout, review the scripts, run `npm approve-scripts esbuild node-pty`,
+  then run `npm install` again.
 
 If node-pty is missing, Helm reports: "node-pty is not installed or failed to build;
 terminals are unavailable".
@@ -61,7 +63,8 @@ command to its `.cmd` name. See [Configuration](configuration.md#windows-hosts).
 
 ## Frontend not built
 
-If the browser shows "Frontend not built.", run `npm run build`, then `npm start`.
+If the browser shows "Frontend not built." in a source checkout, run `npm run build`,
+then `npm start`. A global npm install includes the built frontend.
 
 ## The port is in use
 
