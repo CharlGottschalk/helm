@@ -36,7 +36,7 @@ helm db remove <name>                            # remove a profile and its stor
 helm db test <name>                              # connect and run a read-only SELECT 1
 ```
 
-Run these commands from the Helm repository root as `npx helm db …`. See
+If you run Helm from its source code, use `npx helm db …` in the repository root. See
 [Plugin commands](plugins.md#plugin-commands).
 
 TLS, SSH tunnels and connection URLs are not supported yet.

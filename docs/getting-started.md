@@ -16,23 +16,22 @@ Without TDT, Helm still starts. It then shows sample data. See
 
 ## Install Helm
 
-Helm is not published to npm yet. Install it from the source repository.
+Install Helm from npm:
 
-1. Clone the Helm repository.
-2. In the repository root, install the dependencies:
+```sh
+npm install -g @usetdt/helm
+```
 
-   ```sh
-   npm install
-   ```
+On Linux, the workspace terminal needs the install script of node-pty. npm skips
+install scripts in a global install, so allow that one:
 
-3. Build Helm:
+```sh
+npm install -g @usetdt/helm --allow-scripts=node-pty
+```
 
-   ```sh
-   npm run build
-   ```
-
-If npm reports skipped install scripts for esbuild or node-pty, see
-[Troubleshooting](troubleshooting.md#install-scripts).
+The install adds the `helm` command to your `PATH`. If npm reports skipped install
+scripts, see [Troubleshooting](troubleshooting.md#install-scripts). To run Helm from
+its source code instead, see `DEVELOPMENT.md` in the Helm repository.
 
 ## Add a workspace
 
@@ -52,10 +51,10 @@ Before you start Helm, tell it where your TDT workspace is.
 
 ## Start Helm
 
-1. In the repository root, start the server:
+1. Start the server:
 
    ```sh
-   npm start
+   helm
    ```
 
 2. The server prints a line like this one:
