@@ -7,7 +7,10 @@
 // restricted command runner. TODO: implement SandboxPolicy per platform.
 import { randomUUID } from 'node:crypto'
 import { EventEmitter } from 'node:events'
+import { chmodSync, existsSync } from 'node:fs'
+import { createRequire } from 'node:module'
 import { platform } from 'node:os'
+import { dirname, join } from 'node:path'
 import { confineDirectory } from '../workspaces.js'
 
 type IPty = import('node-pty').IPty
@@ -49,9 +52,25 @@ function defaultShell() {
   return process.env.SHELL ?? '/bin/bash'
 }
 
+/** node-pty 1.1 prebuilds ship macOS spawn-helper without +x, so every spawn fails with posix_spawnp. */
+function ensureSpawnHelperExecutable() {
+  if (platform() !== 'darwin') return
+  try {
+    const root = dirname(createRequire(import.meta.url).resolve('node-pty/package.json'))
+    for (const dir of ['prebuilds/darwin-arm64', 'prebuilds/darwin-x64', 'build/Release']) {
+      const helper = join(root, dir, 'spawn-helper')
+      if (existsSync(helper)) chmodSync(helper, 0o755)
+    }
+  } catch {
+    // read-only install: spawn will surface the real error
+  }
+}
+
 async function loadPty() {
   try {
-    return await import('node-pty')
+    const pty = await import('node-pty')
+    ensureSpawnHelperExecutable()
+    return pty
   } catch {
     throw new Error('node-pty is not installed or failed to build; terminals are unavailable')
   }
