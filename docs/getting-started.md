@@ -33,22 +33,6 @@ The install adds the `helm` command to your `PATH`. If npm reports skipped insta
 scripts, see [Troubleshooting](troubleshooting.md#install-scripts). To run Helm from
 its source code instead, see `DEVELOPMENT.md` in the Helm repository.
 
-## Add a workspace
-
-Before you start Helm, tell it where your TDT workspace is.
-
-1. Create the file `~/.helm/config.json`.
-2. Add your workspace. Replace `/abs/path/to/workspace` with the absolute path of
-   your TDT workspace:
-
-   ```json
-   {
-     "workspaces": [{ "id": "my-workspace", "name": "My workspace", "path": "/abs/path/to/workspace", "profile": "read-only" }]
-   }
-   ```
-
-[Configuration](configuration.md) describes all fields.
-
 ## Start Helm
 
 1. Start the server:
@@ -72,6 +56,45 @@ removes the token from the address bar and keeps it for that browser tab.
 To check the result, look at the tab bar. When Helm is connected, it shows
 "SYS NOMINAL". If it shows "OFFLINE · SAMPLE DATA", see
 [Troubleshooting](troubleshooting.md#offline-mode).
+
+## Add a workspace
+
+If you have no workspace yet, Helm opens the setup screen. It has these steps:
+
+1. **Install TDT.** Helm checks that it can run TDT. If TDT is missing, Helm shows
+   two options:
+   - **Install automatically.** This option shows when pipx is installed. Helm shows
+     the command `pipx install 'thisdamnthing[mcp]'`. Click **Run install** to run
+     it. Helm shows the output. If pipx changed your `PATH`, open a new terminal
+     before you run `tdt` yourself. Helm can continue without a restart.
+   - **Install it yourself.** A guide for your operating system. Helm does not
+     install Python or pipx.
+
+   When TDT is installed, click **Check again**.
+2. **Choose a folder.** Browse to a folder. You can open any folder on your
+   computer. Helm marks the folders that are TDT workspaces. To make a folder, type
+   a name and click **New folder**.
+3. **Connect or create.**
+   - If the folder is a TDT workspace, click **Connect this workspace**.
+   - If it is not, click **Create a TDT workspace here**. Helm runs `tdt init` and
+     then `tdt doctor`. If the folder already contains files, Helm asks you to
+     confirm first. Keep TDT workspaces outside your code projects.
+
+Helm adds the workspace to `~/.helm/config.json` with the `read-only` profile, and
+then opens it. To add more workspaces later, open the workspace switcher at the top
+of the left rail and click **Add workspace**.
+
+You can also add a workspace from a terminal:
+
+```sh
+helm workspace add /path/to/workspace            # connect an existing workspace
+helm workspace add /path/to/folder --init        # create a workspace there first
+helm workspace list                              # show your workspaces
+```
+
+Use `--name <name>` to set the name that Helm shows. If Helm is running, restart it
+to see a workspace that you added from a terminal. [Configuration](configuration.md)
+describes the workspace fields.
 
 ## Stop Helm
 

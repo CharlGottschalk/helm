@@ -1,7 +1,9 @@
 # Configuration
 
-Helm reads its configuration from `~/.helm/config.json`. Helm does not create this
-file. If the file does not exist, Helm uses the default values.
+Helm reads its configuration from `~/.helm/config.json`. If the file does not exist,
+Helm uses the default values. Helm creates the file when you add your first
+workspace, or when an automatic TDT install sets `tdtCommand`. Helm then changes only
+those fields and keeps all other fields.
 
 ## The configuration file
 
@@ -41,8 +43,14 @@ Each entry in `workspaces` has these fields:
 | `path` | The absolute path of the TDT workspace root |
 | `profile` | The TDT access profile: `"read-only"` or `"everyday"` |
 
-Helm has no screen to add or remove workspaces yet. To change your workspaces, edit
-the file and start Helm again.
+To add a workspace, use the setup screen, **Add workspace** in the workspace
+switcher, or `helm workspace add`. See
+[Getting started](getting-started.md#add-a-workspace). Helm gives a new workspace an
+`id` made from its name and the `read-only` profile.
+
+Helm has no screen to edit or remove workspaces yet. To change or remove a
+workspace, edit the file and start Helm again. `helm workspace list` shows your
+workspaces.
 
 For each workspace, Helm starts TDT with this command:
 

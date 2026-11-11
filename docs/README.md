@@ -8,7 +8,7 @@ Helm is in **beta**. Its features and configuration can change between releases.
 
 ## Start here
 
-1. [Getting started](getting-started.md): install Helm, add a workspace and start it.
+1. [Getting started](getting-started.md): install and start Helm, then add a workspace.
 2. [Configuration](configuration.md): `~/.helm/config.json`, workspaces, profiles and
    hosts.
 

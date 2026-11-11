@@ -7,10 +7,11 @@ your pending reviews or your reminders.
 ## The Helm window
 
 - The **left rail** has three groups. **Navigate** contains the Command deck, the
-  brain and the design system. **Tools** contains tools such as the DB explorer and
-  the terminal. **Projects** contains the projects of the workspace.
+  brain. **Tools** contains tools such as the DB explorer and the terminal.
+  **Projects** contains the projects of the workspace.
 - The **workspace switcher** is at the top of the left rail. You can also press
-  Alt+1 to Alt+3 to change the workspace.
+  Alt+1 to Alt+3 to change the workspace. To add a workspace, open the switcher and
+  click **Add workspace**. See [Getting started](getting-started.md#add-a-workspace).
 - The **tab bar** shows your open tabs. To close a tab, click its close button or
   middle-click it.
 - The **Sessions** panel on the right shows your agent sessions and chats. See
