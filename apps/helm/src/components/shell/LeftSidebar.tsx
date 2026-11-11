@@ -60,7 +60,6 @@ export function LeftSidebar() {
         <div className={s.groupLabel}>Navigate</div>
         <NavItem icon="grid" label="Command deck" active={activeTab.kind === 'dashboard'} collapsed={collapsed} onClick={actions.openDashboard} />
         <NavItem icon="brain" label="Brain" active={activeTab.kind === 'graph'} collapsed={collapsed} onClick={() => actions.openGraph()} />
-        <NavItem icon="layers" label="Design system" active={activeTab.kind === 'design'} collapsed={collapsed} onClick={actions.openDesign} />
       </nav>
 
       <nav className={s.group} aria-label="Tools">
