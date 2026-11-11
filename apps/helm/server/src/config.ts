@@ -27,6 +27,9 @@ export interface HelmConfig {
   workspaces: WorkspaceEntry[]
 }
 
+/** This Helm's version, from apps/helm/package.json (the same relative path from src/ and dist/). */
+export const HELM_VERSION: string = JSON.parse(readFileSync(new URL('../../package.json', import.meta.url), 'utf8')).version
+
 export const HELM_HOME = process.env.HELM_HOME ?? join(homedir(), '.helm')
 export const CONFIG_PATH = join(HELM_HOME, 'config.json')
 

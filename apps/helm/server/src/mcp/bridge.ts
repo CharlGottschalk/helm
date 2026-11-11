@@ -5,7 +5,7 @@
 // Requires TDT installed with the mcp extra (pydantic): pipx install 'thisdamnthing[mcp]'
 import { Client } from '@modelcontextprotocol/sdk/client/index.js'
 import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js'
-import type { HelmConfig, WorkspaceEntry } from '../config.js'
+import { HELM_VERSION, type HelmConfig, type WorkspaceEntry } from '../config.js'
 import { ApiError } from '../errors.js'
 
 /** TDT's response envelope (src/thisdamnthing/mcp_tools/models.py: Result). */
@@ -36,7 +36,7 @@ class WorkspaceBridge {
       // Keep tdt's last words so a failed start says why (and drain the pipe so it never fills).
       this.stderrTail = ''
       transport.stderr?.on('data', (chunk: Buffer) => (this.stderrTail = (this.stderrTail + chunk.toString()).slice(-2000)))
-      const client = new Client({ name: 'helm', version: '0.1.0' })
+      const client = new Client({ name: 'helm', version: HELM_VERSION })
       transport.onclose = () => {
         // Child exited (crash, idle, profile change). Reconnect lazily on next call.
         this.client = null

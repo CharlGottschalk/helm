@@ -7,7 +7,7 @@ import { createServer, type IncomingMessage, type ServerResponse } from 'node:ht
 import { dirname, extname, join, normalize, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { WebSocketServer, type WebSocket } from 'ws'
-import { CONFIG_PATH, loadConfig, type HostId } from './config.js'
+import { CONFIG_PATH, HELM_VERSION, loadConfig, type HostId } from './config.js'
 import { BridgePool } from './mcp/bridge.js'
 import { Orchestrator } from './orchestrator.js'
 import { editRecord, knowledgeId } from './records.js'
@@ -81,7 +81,7 @@ function route(method: string, path: string, handler: Handler) {
   routes.push({ method, pattern, keys, handler })
 }
 
-route('GET', '/api/health', async () => ({ ok: true, name: 'helm', version: '0.1.0' }))
+route('GET', '/api/health', async () => ({ ok: true, name: 'helm', version: HELM_VERSION }))
 
 route('GET', '/api/workspaces', async () =>
   config.workspaces.map((w) => ({ ...w, tdt: looksLikeTdtWorkspace(w.path) })),
