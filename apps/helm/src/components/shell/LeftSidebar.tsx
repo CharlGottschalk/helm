@@ -5,6 +5,7 @@ import { useToolTypes } from '@helm/widgets'
 import { useChromeTheme, useHelm } from '../../state/store'
 import { Icon, StatusDot, type IconName } from '@helm/ui'
 import { Logo } from './Logo'
+import { AddWorkspaceDialog } from '../../views/onboarding/Onboarding'
 import s from './LeftSidebar.module.css'
 
 const { statusTone } = offline
@@ -167,8 +168,9 @@ function NavItem({ icon, label, active, collapsed, onClick }: { icon: IconName; 
 }
 
 function WorkspaceSwitcher({ collapsed }: { collapsed: boolean }) {
-  const { ws, workspaces, actions } = useHelm()
+  const { ws, workspaces, online, actions } = useHelm()
   const [open, setOpen] = useState(false)
+  const [adding, setAdding] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -214,11 +216,14 @@ function WorkspaceSwitcher({ collapsed }: { collapsed: boolean }) {
               <span className={s.wsKey}>{w.id === ws.id ? <Icon name="check" size={14} /> : `⌥${i + 1}`}</span>
             </button>
           ))}
-          <button className={cx(s.wsOption, s.wsCreate)} disabled>
-            <Icon name="plus" size={14} /> New workspace
-          </button>
+          {online && (
+            <button className={cx(s.wsOption, s.wsCreate)} onClick={() => (setOpen(false), setAdding(true))}>
+              <Icon name="plus" size={14} /> Add workspace
+            </button>
+          )}
         </div>
       )}
+      {adding && <AddWorkspaceDialog onClose={() => setAdding(false)} />}
     </div>
   )
 }

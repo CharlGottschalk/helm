@@ -15,10 +15,11 @@ import { RecordView } from './views/record/RecordView'
 import { SessionView } from './views/session/SessionView'
 import { TerminalView } from './views/terminal/TerminalView'
 import { ToolHost } from './views/tools/ToolHost'
+import { Onboarding } from './views/onboarding/Onboarding'
 import s from './App.module.css'
 
 export function App() {
-  const { state, workspaces, activeTab, actions } = useHelm()
+  const { state, online, workspaces, activeTab, actions } = useHelm()
 
   // Alt+1..3 switches workspace; Ctrl+, opens settings
   useEffect(() => {
@@ -37,6 +38,9 @@ export function App() {
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
   }, [actions, workspaces])
+
+  // No workspace configured yet: onboarding instead of an empty shell (task 042)
+  if (online && !workspaces.length) return <Onboarding />
 
   const style = {
     '--left': state.leftCollapsed ? 'var(--rail-w)' : 'var(--left-w)',

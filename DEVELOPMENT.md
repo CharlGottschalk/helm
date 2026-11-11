@@ -43,8 +43,10 @@ npm run build && npm start   # production: one server on :4317, prints the priva
 
 ## Configure workspaces
 
-Configure workspaces in `~/.helm/config.json`. To use a different folder, set
-`HELM_HOME`.
+Add workspaces through Helm's onboarding (shown when none are configured, and from the
+workspace switcher's Add workspace), with `helm workspace add <path> [--name <n>] [--init]`
+and `helm workspace list`, or by editing `~/.helm/config.json`. To use a different folder,
+set `HELM_HOME`.
 
 ```json
 {
@@ -109,7 +111,7 @@ Replace `/abs/path/to/workspace` with the absolute path of your TDT workspace.
    `user_instruction`) and `openTerminal`.
 6. **Terminal confinement:** An OS sandbox through `SandboxPolicy`
    (`apps/helm/server/src/terminal/pty.ts`).
-7. **Config UI:** Add and remove workspaces, opt in to the everyday profile, a host
+7. **Config UI:** Remove and edit workspaces (adding is done), opt in to the everyday profile, a host
    picker, and HTTP auth profiles in the OS keychain.
 8. **`tdt-helm` stack:** The stack is in its own repository (`tdt-helm`, Apache-2.0).
    Its skills make plugins with `npx @usetdt/helm-sdk` and read the bundled docs of
