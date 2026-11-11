@@ -21,6 +21,7 @@ export interface TdtResult<T = unknown> {
 class WorkspaceBridge {
   private client: Client | null = null
   private connecting: Promise<Client> | null = null
+  private stderrTail = ''
 
   constructor(private ws: WorkspaceEntry, private tdtCommand: string) {}
 
@@ -32,6 +33,9 @@ class WorkspaceBridge {
         args: ['--workspace', this.ws.path, 'mcp', 'serve', '--profile', this.ws.profile],
         stderr: 'pipe',
       })
+      // Keep tdt's last words so a failed start says why (and drain the pipe so it never fills).
+      this.stderrTail = ''
+      transport.stderr?.on('data', (chunk: Buffer) => (this.stderrTail = (this.stderrTail + chunk.toString()).slice(-2000)))
       const client = new Client({ name: 'helm', version: '0.1.0' })
       transport.onclose = () => {
         // Child exited (crash, idle, profile change). Reconnect lazily on next call.
@@ -46,8 +50,11 @@ class WorkspaceBridge {
       return await this.connecting
     } catch (error) {
       this.connecting = null
-      console.warn(`[helm] tdt mcp for ${this.ws.id} failed: ${(error as Error).message}`)
-      throw new ApiError(502, `TDT is unavailable for this workspace. Check that \`${this.tdtCommand}\` is on PATH and installed with the mcp extra: pipx install 'thisdamnthing[mcp]'`)
+      const said = this.stderrTail.trim()
+      console.warn(`[helm] tdt mcp for ${this.ws.id} failed: ${(error as Error).message}${said ? `\n[helm] tdt said: ${said}` : ''}`)
+      throw new ApiError(502, said
+        ? `TDT could not start for this workspace: ${said}`
+        : `TDT is unavailable for this workspace. Check that \`${this.tdtCommand}\` is on PATH and installed with the mcp extra: pipx install 'thisdamnthing[mcp]'`)
     }
   }
 
