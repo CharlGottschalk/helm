@@ -15,7 +15,10 @@ credentials and your workspace.
   data and frames only from Helm itself.
 
 Keep the Helm URL private. The token in it gives full access to Helm while that token
-is valid.
+is valid. This includes the setup screen: it can list the folders that your user
+account can read, make folders, and run `tdt init`, `tdt doctor` and
+`pipx install 'thisdamnthing[mcp]'`. Helm runs these commands directly, never through
+a shell, and only on a folder that you choose.
 
 ## Credentials
 

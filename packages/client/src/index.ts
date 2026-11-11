@@ -34,6 +34,23 @@ export interface ServerWorkspace {
   tdt: boolean
 }
 
+export interface TdtStatus {
+  platform: string
+  tdt: { ok: boolean; command: string; version?: string; error?: string }
+  pipx: { ok: boolean; version?: string }
+}
+
+export interface FolderListing {
+  path: string
+  home: string
+  parent: string | null
+  crumbs: { name: string; path: string }[]
+  /** this folder is a TDT workspace */
+  workspace: boolean
+  empty: boolean
+  folders: { name: string; path: string; workspace: boolean }[]
+}
+
 interface Snapshot {
   status: ServerStatus
   sessions: AgentSession[]
@@ -400,6 +417,26 @@ export class HelmServer {
   /** Resume a TDT UI interview (everyday profile) and get its private URL; open it, never store it. */
   openInterview(workspaceId: string, sessionId: string) {
     return this.request<{ url: string }>('POST', `/api/workspaces/${workspaceId}/interviews/${encodeURIComponent(sessionId)}/open`)
+  }
+
+  /* ── onboarding / add workspace (task 042) ── */
+  tdtStatus() {
+    return this.request<TdtStatus>('GET', '/api/onboarding/tdt')
+  }
+  installTdt() {
+    return this.request<{ ok: boolean; output: string; pathChanged: boolean; tdtCommand?: string }>('POST', '/api/onboarding/tdt/install')
+  }
+  listFolder(path?: string) {
+    return this.request<FolderListing>('POST', '/api/onboarding/folders/list', { path })
+  }
+  createFolder(parent: string, name: string) {
+    return this.request<{ path: string }>('POST', '/api/onboarding/folders/create', { parent, name })
+  }
+  /** Register (or with `init`, create) a workspace; the new list is live at once. */
+  async addWorkspace(input: { path: string; name?: string; init?: boolean }) {
+    const r = await this.request<{ workspace: ServerWorkspace; created: boolean; output: string }>('POST', '/api/workspaces', input)
+    if (!this.snapshot.workspaces.some((w) => w.id === r.workspace.id)) this.set({ workspaces: [...this.snapshot.workspaces, r.workspace] })
+    return r
   }
 
   /* ── sessions ── */

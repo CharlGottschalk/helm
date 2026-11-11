@@ -7,7 +7,7 @@ import { Client } from '@modelcontextprotocol/sdk/client/index.js'
 import { getDefaultEnvironment, StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js'
 import { StreamableHTTPClientTransport } from '@modelcontextprotocol/sdk/client/streamableHttp.js'
 import { SERVICE_NAME, type FilesResult } from '@usetdt/helm-sdk'
-import { readHelmFile, writeHelmFile, type WorkspaceEntry } from './config.js'
+import { HELM_VERSION, readHelmFile, writeHelmFile, type WorkspaceEntry } from './config.js'
 import { digest, issue, spend } from './confirm.js'
 import { ApiError } from './errors.js'
 import { declaration } from './extensions.js'
@@ -90,7 +90,7 @@ function connect(name: string, server: McpServer) {
             // the safe default environment (PATH, HOME…), plus the token in its one named variable
             env: { ...getDefaultEnvironment(), ...(server.tokenEnv && token ? { [server.tokenEnv]: token } : {}) },
           })
-    const client = new Client({ name: 'helm', version: '0.1.0' })
+    const client = new Client({ name: 'helm', version: HELM_VERSION })
     transport.onclose = () => void (clients.get(name) === c && clients.delete(name)) // reconnect lazily next time
     c = client.connect(transport).then(() => client)
     c.catch(() => clients.get(name) === c && clients.delete(name))

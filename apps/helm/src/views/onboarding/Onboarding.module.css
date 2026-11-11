@@ -1,0 +1,154 @@
+/* First-run onboarding and the Add workspace dialog (task 042). Theme tokens only. */
+.screen {
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+  padding: var(--sp-6);
+  background: var(--c-bg-0);
+}
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 900;
+  display: grid;
+  place-items: center;
+  padding: var(--sp-6);
+  background: rgb(0 0 0 / 0.55);
+  backdrop-filter: blur(6px);
+}
+
+.card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-5);
+  width: min(720px, 100%);
+  max-height: calc(100dvh - 2 * var(--sp-6));
+  overflow: auto;
+  padding: var(--sp-6);
+  background: var(--c-chrome);
+  border: 1px solid var(--c-line-strong);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-float);
+  color: var(--c-text-1);
+  font-size: var(--fs-sm);
+}
+
+.close {
+  position: absolute;
+  top: var(--sp-3);
+  right: var(--sp-3);
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  color: var(--c-text-2);
+  border-radius: var(--radius-sm);
+}
+.close:hover { color: var(--c-text-0); background: var(--c-surface-hover); }
+
+.header { display: flex; flex-direction: column; gap: var(--sp-2); }
+.title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: var(--display-weight);
+  font-size: var(--fs-2xl);
+  letter-spacing: var(--tracking-title);
+  color: var(--c-text-0);
+}
+.lede { margin: 0; color: var(--c-text-1); }
+
+.step { display: flex; flex-direction: column; gap: var(--sp-3); }
+.step p { margin: 0; }
+.stepTitle {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  margin: 0;
+  font-size: var(--fs-md);
+  color: var(--c-text-0);
+}
+.num {
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  font-family: var(--font-mono);
+  font-size: var(--fs-xs);
+  color: var(--c-on-accent);
+  background: var(--c-cyan);
+  border-radius: var(--radius-sm);
+}
+.found { margin-left: auto; }
+
+.row { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-2); }
+.row > :first-child:not(button) { flex: 1 1 220px; }
+
+.muted { color: var(--c-text-2); }
+.warn { color: var(--c-amber); }
+.error { color: var(--c-red); }
+code, .command, .output { font-family: var(--font-mono); font-size: var(--fs-xs); }
+.command, .output {
+  margin: 0;
+  padding: var(--sp-3);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  background: var(--c-well);
+  border: 1px solid var(--c-line);
+  border-radius: var(--radius-sm);
+  color: var(--c-text-1);
+}
+.output { max-height: 220px; overflow: auto; }
+.errorOut { color: var(--c-red); border-color: var(--c-red); }
+
+.confirm, .note, .selected {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  padding: var(--sp-3);
+  background: var(--c-surface);
+  border: 1px solid var(--c-line);
+  border-radius: var(--radius-sm);
+}
+
+.guide summary { cursor: pointer; color: var(--c-text-0); }
+.steps { margin: var(--sp-2) 0 0; padding-left: var(--sp-5); display: flex; flex-direction: column; gap: var(--sp-2); }
+
+.crumbs {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sp-1);
+  font-family: var(--font-mono);
+  font-size: var(--fs-xs);
+}
+.crumb { display: inline-flex; align-items: center; gap: var(--sp-1); color: var(--c-text-3); }
+.crumbs button { color: var(--c-text-1); padding: 2px 4px; border-radius: var(--radius-sm); }
+.crumbs button:hover { color: var(--c-text-0); background: var(--c-surface-hover); }
+.crumbs button[aria-current] { color: var(--c-cyan); }
+.home { margin-left: auto; }
+
+.folders {
+  margin: 0;
+  padding: var(--sp-1);
+  list-style: none;
+  max-height: 260px;
+  overflow: auto;
+  background: var(--c-well);
+  border: 1px solid var(--c-line);
+  border-radius: var(--radius-sm);
+}
+.folders li.muted { padding: var(--sp-2); }
+.folders button {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  width: 100%;
+  padding: var(--sp-2);
+  text-align: left;
+  color: var(--c-text-1);
+  border-radius: var(--radius-sm);
+}
+.folders button:hover, .folders button:focus-visible { color: var(--c-text-0); background: var(--c-surface-hover); }
+.fname { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }

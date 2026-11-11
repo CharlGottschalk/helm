@@ -1,0 +1,105 @@
+# Publish @usetdt/helm-sdk or @usetdt/helm to npm with provenance (task 040).
+#
+# A pushed tag picks the package: helm-sdk-vX.Y.Z → packages/sdk, helm-vX.Y.Z → apps/helm.
+# The tag must point at a commit on main, and X.Y.Z must equal the package version.
+# Run it by hand (Actions → Publish to npm → Run workflow) for a dry run of either package:
+# the same checks and build, then `npm pack --dry-run` instead of publishing.
+#
+# Authentication is npm trusted publishing (OIDC): no npm token is stored anywhere. Each
+# package needs a trusted publisher on npmjs.com for this repository, the workflow file
+# `publish.yml` and the environment `release`. See DEVELOPMENT.md → Release.
+name: Publish to npm
+
+on:
+  push:
+    tags: ['helm-sdk-v*', 'helm-v*']
+  workflow_dispatch:
+    inputs:
+      package:
+        description: Package to dry-run
+        type: choice
+        options: [helm-sdk, helm]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: publish-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    environment: release
+    permissions:
+      contents: read
+      id-token: write # OIDC for trusted publishing and the provenance statement
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # to check that the tag is on main
+          persist-credentials: false
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          registry-url: https://registry.npmjs.org
+
+      - name: Resolve package and check the version
+        id: pkg
+        env:
+          EVENT: ${{ github.event_name }}
+          REF_NAME: ${{ github.ref_name }}
+          INPUT_PACKAGE: ${{ inputs.package }}
+        run: |
+          set -euo pipefail
+          if [ "$EVENT" = push ]; then
+            case "$REF_NAME" in
+              helm-sdk-v*) name=helm-sdk; tag_version=${REF_NAME#helm-sdk-v} ;;
+              helm-v*)     name=helm;     tag_version=${REF_NAME#helm-v} ;;
+              *) echo "::error::Unexpected tag $REF_NAME"; exit 1 ;;
+            esac
+            dry_run=false
+          else
+            name=$INPUT_PACKAGE
+            dry_run=true
+          fi
+          case "$name" in
+            helm-sdk) dir=packages/sdk ;;
+            helm)     dir=apps/helm ;;
+            *) echo "::error::Unknown package $name"; exit 1 ;;
+          esac
+          version=$(node -p "require('./$dir/package.json').version")
+          workspace=$(node -p "require('./$dir/package.json').name")
+          if [ "$EVENT" = push ]; then
+            if [ "$tag_version" != "$version" ]; then
+              echo "::error::Tag $REF_NAME does not match $workspace@$version"; exit 1
+            fi
+            if ! git merge-base --is-ancestor "$GITHUB_SHA" origin/main; then
+              echo "::error::Tag $REF_NAME is not on main. Tag a merged commit."; exit 1
+            fi
+          fi
+          echo "Publishing $workspace@$version (dry run: $dry_run)"
+          {
+            echo "workspace=$workspace"
+            echo "dry_run=$dry_run"
+          } >> "$GITHUB_OUTPUT"
+
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm run build
+      - run: npm run check -w @usetdt/helm-sdk
+
+      - name: Publish
+        env:
+          WORKSPACE: ${{ steps.pkg.outputs.workspace }}
+          DRY_RUN: ${{ steps.pkg.outputs.dry_run }}
+        run: |
+          set -euo pipefail
+          if [ "$DRY_RUN" = true ]; then
+            # npm refuses even a dry-run publish of a version that is already on npm,
+            # so a manual run lists the tarball instead.
+            npm pack -w "$WORKSPACE" --dry-run
+          else
+            npm publish -w "$WORKSPACE" --provenance --access public
+          fi

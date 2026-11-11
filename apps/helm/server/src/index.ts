@@ -7,7 +7,7 @@ import { createServer, type IncomingMessage, type ServerResponse } from 'node:ht
 import { dirname, extname, join, normalize, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { WebSocketServer, type WebSocket } from 'ws'
-import { CONFIG_PATH, loadConfig, type HostId } from './config.js'
+import { CONFIG_PATH, HELM_VERSION, loadConfig, type HostId } from './config.js'
 import { BridgePool } from './mcp/bridge.js'
 import { Orchestrator } from './orchestrator.js'
 import { editRecord, knowledgeId } from './records.js'
@@ -22,6 +22,7 @@ import { connectHttpProfile, httpCall, httpConfirm, listHttpProfiles, removeHttp
 import { finishConnect, setRedirectUri } from './oauth.js'
 import { closeAllMcp, listMcpServers, mcpCall, mcpConfirm, removeMcpServer, saveMcpServer, testMcpServer } from './mcp.js'
 import { getWorkspace, looksLikeTdtWorkspace } from './workspaces.js'
+import { addWorkspace, createFolder, installTdt, listFolder, tdtStatus } from './onboarding.js'
 
 const config = loadConfig()
 const port = Number(process.env.HELM_PORT ?? config.port)
@@ -80,12 +81,23 @@ function route(method: string, path: string, handler: Handler) {
   routes.push({ method, pattern, keys, handler })
 }
 
-route('GET', '/api/health', async () => ({ ok: true, name: 'helm', version: '0.1.0' }))
+route('GET', '/api/health', async () => ({ ok: true, name: 'helm', version: HELM_VERSION }))
 
 route('GET', '/api/workspaces', async () =>
   config.workspaces.map((w) => ({ ...w, tdt: looksLikeTdtWorkspace(w.path) })),
 )
-// TODO: POST /api/workspaces (add), PATCH profile, DELETE. Validate path is a TDT workspace; saveConfig().
+// Onboarding and "Add workspace" (task 042, onboarding.ts). Editing/removing workspaces stays out of scope.
+route('POST', '/api/workspaces', async (req) => {
+  const r = await addWorkspace(config, await readJson(req))
+  return { ...r, workspace: { ...r.workspace, tdt: true } }
+})
+route('GET', '/api/onboarding/tdt', async () => tdtStatus(config))
+route('POST', '/api/onboarding/tdt/install', async () => installTdt(config))
+route('POST', '/api/onboarding/folders/list', async (req) => listFolder((await readJson(req)).path as string | undefined))
+route('POST', '/api/onboarding/folders/create', async (req) => {
+  const b = await readJson(req)
+  return createFolder(b.parent, b.name)
+})
 
 route('GET', '/api/workspaces/:ws/tools', async (_req, p) => bridges.get(getWorkspace(config, p.ws)).listTools())
 

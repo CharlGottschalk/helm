@@ -25,6 +25,40 @@ npm run check:plugins -w @usetdt/helm   # also check:files, check:db, check:conn
 [Conventional Commits](https://www.conventionalcommits.org/) (`feat:`, `fix:`, `docs:`, …)
 and open a pull request.
 
+## Release
+
+GitHub Actions publishes the two npm packages with provenance
+(`.github/workflows/publish.yml`). Each package has its own tag: `helm-sdk-vX.Y.Z` for
+`@usetdt/helm-sdk` (`packages/sdk`) and `helm-vX.Y.Z` for `@usetdt/helm` (`apps/helm`).
+
+1. In a pull request, set `version` in the package's `package.json`. If you release the
+   SDK and Helm together, release the SDK first and raise Helm's `@usetdt/helm-sdk` range.
+2. Merge the pull request, then tag the merged commit on `main` and push the tag:
+
+   ```sh
+   git switch main && git pull
+   git tag helm-vX.Y.Z
+   git push origin helm-vX.Y.Z
+   ```
+
+3. The workflow checks that the tag matches the package version and is on `main`, runs
+   `npm ci`, typecheck, build and the SDK check, and then runs `npm publish --provenance`.
+4. Check the release: the npm page of the version shows a provenance statement, and
+   `npm audit signatures` in a project that installs it passes.
+5. Create the GitHub pre-release for the tag.
+
+To test without publishing, run the workflow by hand (Actions → Publish to npm → Run
+workflow) and choose the package. A manual run is always a dry run: it runs the same
+checks and build, then lists the package contents with `npm pack --dry-run`. Only a
+real release shows the provenance statement.
+
+No npm token is stored in the repository or in GitHub. The workflow uses npm trusted
+publishing (OIDC). One-time setup by the npm package owner, for each package on
+npmjs.com (package → Settings → Trusted publishing → GitHub Actions):
+organization or user `CharlGottschalk`, repository `helm`, workflow file `publish.yml`,
+environment `release`. Optionally add required reviewers to the `release` environment in
+the GitHub repository settings, so that each publish waits for approval.
+
 ## Run Helm
 
 Run these commands from the repository root:
@@ -43,8 +77,10 @@ npm run build && npm start   # production: one server on :4317, prints the priva
 
 ## Configure workspaces
 
-Configure workspaces in `~/.helm/config.json`. To use a different folder, set
-`HELM_HOME`.
+Add workspaces through Helm's onboarding (shown when none are configured, and from the
+workspace switcher's Add workspace), with `helm workspace add <path> [--name <n>] [--init]`
+and `helm workspace list`, or by editing `~/.helm/config.json`. To use a different folder,
+set `HELM_HOME`.
 
 ```json
 {
@@ -109,7 +145,7 @@ Replace `/abs/path/to/workspace` with the absolute path of your TDT workspace.
    `user_instruction`) and `openTerminal`.
 6. **Terminal confinement:** An OS sandbox through `SandboxPolicy`
    (`apps/helm/server/src/terminal/pty.ts`).
-7. **Config UI:** Add and remove workspaces, opt in to the everyday profile, a host
+7. **Config UI:** Remove and edit workspaces (adding is done), opt in to the everyday profile, a host
    picker, and HTTP auth profiles in the OS keychain.
 8. **`tdt-helm` stack:** The stack is in its own repository (`tdt-helm`, Apache-2.0).
    Its skills make plugins with `npx @usetdt/helm-sdk` and read the bundled docs of

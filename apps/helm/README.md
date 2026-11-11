@@ -27,11 +27,15 @@ For live data, install TDT with the MCP extra: `pipx install 'thisdamnthing[mcp]
 
 ## Start
 
-Add your workspace to `~/.helm/config.json` (see Configuration in the docs), then run:
+Run:
 
 ```sh
 helm
 ```
+
+The first time, Helm walks you through it: it checks TDT (and can install it), then lets
+you pick an existing workspace or create a new one. You can also register one from the
+terminal: `helm workspace add <path>` (`--init` creates a workspace there first).
 
 Helm prints a local URL with an access token. Open it in your browser.
 

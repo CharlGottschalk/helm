@@ -18,7 +18,24 @@ In offline mode, changes affect only the sample data.
 
 ## TDT is unavailable
 
-If Helm cannot start TDT for a workspace, it shows this message:
+If TDT starts but then stops, Helm shows the error that TDT gave:
+
+```text
+TDT could not start for this workspace: <the error from TDT>
+```
+
+The error tells you the cause. Frequent causes:
+
+- `No ThisDamnThing workspace found`: the `path` of the workspace is not a TDT
+  workspace root. Correct the `path` in `~/.helm/config.json`.
+- `invalid choice` or `unrecognized arguments`: Helm found a different or older
+  `tdt` than the one that you use. Run `which -a tdt` (on Windows, `where tdt`) and
+  `tdt --version`. Upgrade TDT, or set `tdtCommand` to the absolute path of the
+  correct `tdt`. See [Configuration](configuration.md).
+- An error about `pydantic` or `mcp`: TDT does not have the MCP extra. Run
+  `pipx install --force 'thisdamnthing[mcp]'`.
+
+If Helm cannot run `tdt` at all, it shows this message:
 
 ```text
 TDT is unavailable for this workspace. Check that `tdt` is on PATH and installed with the mcp extra: pipx install 'thisdamnthing[mcp]'
@@ -29,7 +46,15 @@ TDT is unavailable for this workspace. Check that `tdt` is on PATH and installed
 2. Make sure that TDT has the MCP extra: `pipx install 'thisdamnthing[mcp]'`.
 3. Start Helm again.
 
-The server log also shows `[helm] tdt mcp for <workspace> failed: …` with the cause.
+To find the cause yourself, run the command that Helm runs:
+
+```sh
+tdt --workspace <path> mcp serve --profile <profile>
+```
+
+If TDT is correct, the command waits for input. Press Ctrl+C to stop it. If it stops
+by itself, its message is the cause. The server log also shows
+`[helm] tdt mcp for <workspace> failed: …` and `[helm] tdt said: …`.
 
 ## The workspace has no TDT harness
 
@@ -39,8 +64,15 @@ start Helm again.
 
 ## No workspaces configured
 
-If Helm shows "No workspaces configured. Add one to ~/.helm/config.json.", add a
-workspace as [Getting started](getting-started.md#add-a-workspace) describes.
+If you have no workspaces, Helm opens the setup screen. Use it to add a workspace as
+[Getting started](getting-started.md#add-a-workspace) describes.
+
+If the setup screen shows "Helm cannot read <folder>", Helm does not have permission
+to open that folder. Choose a different folder.
+
+If **Create a TDT workspace here** fails, Helm shows the output of `tdt init` or
+`tdt doctor`. Helm adds the workspace only when both commands succeed. Correct the
+problem that the output shows, then try again.
 
 ## Install scripts
 
