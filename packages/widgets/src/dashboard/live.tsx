@@ -1,7 +1,7 @@
 // Live versions of the built-in widgets: TDT data through the Helm server.
 // The registry shows these when a server answers and the sample versions otherwise.
-import { useMemo, useState, type FormEvent, type ReactNode } from 'react'
-import { Badge, Button, Icon, Meter, RadialGauge, StatusDot, color, cx, relTime, type IconName, type Tone } from '@helm/ui'
+import { useMemo, useState, type FormEvent } from 'react'
+import { Badge, Button, Icon, Meter, RadialGauge, StatusDot, color, cx, relTime, type Tone } from '@helm/ui'
 import {
   server,
   TdtError,
@@ -456,30 +456,6 @@ export function LiveSessionsWidget() {
       <Button size="sm" icon="plus" onClick={() => startChat()}>
         New session
       </Button>
-    </div>
-  )
-}
-
-/* ── Quick actions (core skill hand-offs) ────────────── */
-export function LiveQuickActionsWidget() {
-  const { startChat, openGraph, openDesign, openSettings, handoff } = useWidgetHost()
-  const items: { icon: IconName; label: string; hint: ReactNode; run: () => void }[] = [
-    { icon: 'chat', label: 'New session', hint: 'Start a chat', run: () => startChat() },
-    { icon: 'brain', label: 'Open brain', hint: 'Graph & search', run: () => openGraph() },
-    { icon: 'check', label: 'Review brain', hint: '/tdt-review-brain', run: () => handoff('/tdt-review-brain') },
-    { icon: 'calendar', label: 'Reminders', hint: '/tdt-check-reminders', run: () => handoff('/tdt-check-reminders') },
-    { icon: 'layers', label: 'Design system', hint: 'Tokens & parts', run: openDesign },
-    { icon: 'cog', label: 'Settings', hint: 'Theme & effects', run: openSettings },
-  ]
-  return (
-    <div className={s.quick}>
-      {items.map((it) => (
-        <button key={it.label} className={s.quickTile} onClick={it.run}>
-          <Icon name={it.icon} size={18} />
-          <span className={s.quickLabel}>{it.label}</span>
-          <span className={s.quickHint}>{it.hint}</span>
-        </button>
-      ))}
     </div>
   )
 }

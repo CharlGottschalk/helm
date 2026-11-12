@@ -11,6 +11,8 @@
 .dialog {
   width: min(520px, 100%);
   max-height: min(720px, 100%);
+  /* without this the grid row grows to the form's full height (long list settings) and pushes the dialog off-screen */
+  min-height: 0;
   display: flex;
   flex-direction: column;
   background: var(--c-chrome);

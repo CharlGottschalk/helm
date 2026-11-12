@@ -5,9 +5,24 @@ import { cpSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:f
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { KIT_CSS, allowed, isWrite, matchesGlob, parseThemeTokens, themeContrast, tokensCss, validateManifest, validatePluginPackage, validateTheme } from '../dist/index.js'
+import { KIT_CSS, allowed, isWrite, lintSettingFields, matchesGlob, parseThemeTokens, requiredMissing, resolveSettings, themeContrast, tokensCss, validateManifest, validatePluginPackage, validateSettings, validateTheme } from '../dist/index.js'
 
 const ex = new URL('../examples/helm-plugin-example/', import.meta.url)
+// settings: list fields (entries validated per sub-field, max entries, no nested lists) and `when` conditions (task 045)
+{
+  const fields = [{ id: 'b', type: 'list', label: 'B', max: 2, fields: [
+    { id: 'kind', type: 'select', label: 'K', options: ['a', 'x'] },
+    { id: 'name', type: 'text', label: 'N', required: true, when: { field: 'kind', is: 'a' } }] }]
+  assert.deepEqual(resolveSettings(fields, {}), { b: [] })
+  assert.deepEqual(validateSettings(fields, { b: [{ kind: 'x' }] }), {})
+  assert.deepEqual(validateSettings(fields, { b: [{ kind: 'x' }, { kind: 'a' }] }), { 'b.1.name': 'Required' })
+  assert.equal(validateSettings(fields, { b: [{}, {}, {}] }).b, 'At most 2 entries')
+  assert.equal(validateSettings(fields, { b: 'nope' }).b, 'Must be a list')
+  assert.deepEqual(lintSettingFields(fields), [])
+  assert.match(lintSettingFields([{ id: 'l', type: 'list', label: 'L', fields: [{ id: 'n', type: 'list', label: 'N', fields: [{ id: 't', type: 'text', label: 'T' }] }] }])[0], /cannot hold another list/)
+  assert.match(lintSettingFields([{ id: 't', type: 'text', label: 'T', when: { field: 'nope', is: 'a' } }])[0], /when.field/)
+  assert.equal(requiredMissing([{ id: 'k', type: 'select', label: 'K', options: ['a'] }, { id: 't', type: 'text', label: 'T', required: true, when: { field: 'k', is: 'a' } }], { k: 'b' }), false)
+}
 const json = (p) => JSON.parse(readFileSync(new URL(p, ex), 'utf8'))
 assert.deepEqual(validatePluginPackage(json('package.json')), [])
 assert.deepEqual(validateManifest(json('widgets/workspace-status/manifest.json'), 'widget'), [])

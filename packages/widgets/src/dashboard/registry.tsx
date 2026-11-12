@@ -2,9 +2,10 @@
 // contracts/settings.md and is rendered by the generic SettingsForm.
 import type { ReactNode } from 'react'
 import type { IconName } from '@helm/ui'
-import type { ConnectionDecl, SettingField, SettingValues, WidgetCapability, WidgetCategory } from '@usetdt/helm-sdk'
+import type { ConnectionDecl, ListItem, SettingField, SettingValues, WidgetCapability, WidgetCategory } from '@usetdt/helm-sdk'
 import { FocusTimerWidget } from './focusTimer'
-import { LiveActivityWidget, LiveAgentRunsWidget, LiveBrainRadarWidget, LiveCalendarWidget, LiveHealthWidget, LiveKpiWidget, LiveNotesWidget, LiveProjectSpotlightWidget, LiveQuickActionsWidget, LiveSessionsWidget, LiveReviewQueueWidget, LiveStacksWidget, LiveRelaysWidget, LiveInterviewsWidget } from './live'
+import { QuickActionsWidget, quickActionSettings } from './quickActions'
+import { LiveActivityWidget, LiveAgentRunsWidget, LiveBrainRadarWidget, LiveCalendarWidget, LiveHealthWidget, LiveKpiWidget, LiveNotesWidget, LiveProjectSpotlightWidget, LiveSessionsWidget, LiveReviewQueueWidget, LiveStacksWidget, LiveRelaysWidget, LiveInterviewsWidget } from './live'
 import { useWidgetHost } from '../host'
 import type { ComponentType } from 'react'
 
@@ -49,8 +50,6 @@ const Notes = needsServer(LiveNotesWidget)
 const Radar = needsServer(LiveBrainRadarWidget)
 const Runs = needsServer(LiveAgentRunsWidget)
 const Sessions = needsServer(LiveSessionsWidget)
-// works offline: only shell actions and hand-offs
-const Quick = LiveQuickActionsWidget
 const ReviewQueue = needsServer(LiveReviewQueueWidget)
 const Stacks = needsServer(LiveStacksWidget)
 const Relays = needsServer(LiveRelaysWidget)
@@ -110,7 +109,10 @@ export const widgetTypes: WidgetType[] = [
   { type: 'sessions', title: 'Recent sessions', code: 'W-07', icon: 'chat', category: 'Agents', description: 'Latest agent sessions in this workspace. Click to reopen in a tab.', w: 2, h: 4, minW: 2, minH: 3, render: () => <Sessions /> },
   { type: 'stacks', title: 'Stacks & skills', code: 'W-14', icon: 'hex', category: 'Utility', description: 'Installed stacks with an on-demand marketplace update check, and pending skill proposals.', w: 2, h: 4, minW: 2, minH: 3,
     connections: [tdt('tdt_stack_list', 'tdt_skill_proposals', 'tdt_marketplace_read')], render: () => <Stacks /> },
-  { type: 'quick', title: 'Quick actions', code: 'W-11', icon: 'grid', category: 'Utility', description: 'One-click launchers for sessions, the brain, core skills and settings.', w: 3, h: 3, minW: 2, minH: 2, render: () => <Quick /> },
+  // works offline (shell actions and hand-offs); local apps need the server
+  { type: 'quick', title: 'Quick actions', code: 'W-11', icon: 'grid', category: 'Utility', description: 'Buttons you choose: run a skill in a new session, open a tool, a Helm function or a local app. Add one per set of buttons.', w: 3, h: 3, minW: 2, minH: 2, multi: true,
+    settings: quickActionSettings, connections: [tdt('tdt_skill_list', 'tdt_project_list')],
+    render: (_i, s, ctx) => <QuickActionsWidget buttons={(s.buttons as ListItem[] | undefined) ?? []} openSettings={ctx?.openSettings} /> },
 ]
 
 export const widgetType = (type: string) => widgetTypes.find((t) => t.type === type)

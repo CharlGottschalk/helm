@@ -122,6 +122,14 @@ export interface McpServerView {
 }
 export type McpServerInput = Omit<McpServerView, 'hasToken'> & { token?: string }
 
+/** An allowlisted local app (Settings → Local apps); Quick actions launch it by id. */
+export interface LocalAppView {
+  id: string
+  name: string
+  command: string
+  args: string[]
+}
+
 /** What Helm's write dialog shows, built by the server from the declaration (or the explorer's exact SQL). */
 export type WriteSummary =
   | { kind: 'db-write'; actor: string; operation: string | null; profile: string; engine: DbEngine; sql: string; args: (string | number | boolean | null)[] }
@@ -355,6 +363,21 @@ export class HelmServer {
   }
   testMcpServer(name: string) {
     return this.request<FilesResult<{ tools: string[] }>>('POST', `/api/mcp/servers/${encodeURIComponent(name)}/test`)
+  }
+
+  /* ── local apps allowlist (task 045) ── */
+  localApps() {
+    return this.request<{ apps: LocalAppView[] }>('GET', '/api/apps')
+  }
+  saveLocalApp(body: LocalAppView) {
+    return this.request<LocalAppView>('POST', '/api/apps', body)
+  }
+  removeLocalApp(id: string) {
+    return this.request<{ ok: true }>('DELETE', `/api/apps/${encodeURIComponent(id)}`)
+  }
+  /** Start an allowlisted app; rejects with a message to show. */
+  launchLocalApp(id: string) {
+    return this.request<{ ok: true; name: string }>('POST', `/api/apps/${encodeURIComponent(id)}/launch`)
   }
 
   /* ── database profiles (passwords are write-only) ── */

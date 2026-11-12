@@ -46,7 +46,8 @@
     "check:files": "node server/test/files-check.mjs",
     "check:db": "node server/test/db-check.mjs",
     "check:connections": "node server/test/connections-check.mjs",
-    "check:oauth": "node server/test/oauth-check.mjs"
+    "check:oauth": "node server/test/oauth-check.mjs",
+    "check:apps": "node server/test/apps-check.mjs"
   },
   "dependencies": {
     "@codemirror/commands": "^6.11.1",
