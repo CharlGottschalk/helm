@@ -8,6 +8,7 @@ import { TabBar } from './components/shell/TabBar'
 import { useHelm } from './state/store'
 import { BrainGraph } from './views/graph/BrainGraph'
 import { ProjectGraph } from './views/graph/ProjectGraph'
+import { UsageReport } from './views/usage/UsageReport'
 import { ChatView } from './views/chat/ChatView'
 import { Dashboard } from './views/dashboard/Dashboard'
 import { DesignSystem } from './views/design/DesignSystem'
@@ -61,6 +62,9 @@ export function App() {
       break
     case 'project':
       view = <ProjectView key={activeTab.id} projectId={activeTab.refId!} />
+      break
+    case 'usage':
+      view = <UsageReport />
       break
     case 'design':
       view = <DesignSystem />

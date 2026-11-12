@@ -137,6 +137,30 @@ export interface HostUsage {
   updatedAt: number | null
 }
 
+/** Token usage report (task 050): the four priced token classes, kept apart for later costs. */
+export interface UsageTokens {
+  input: number
+  cacheWrite: number
+  cacheRead: number
+  output: number
+}
+export interface UsageReportSession {
+  host: HostId
+  id: string
+  /** project folder name only */
+  project: string
+  startedAt: number
+  byModel: Record<string, UsageTokens>
+  helm?: { id: string; wsId: string; title: string }
+}
+export interface UsageReport {
+  from: number
+  to: number
+  days: { date: string; claude: UsageTokens; codex: UsageTokens }[]
+  sessions: UsageReportSession[]
+  skipped: number
+}
+
 /** Context window of one agent session (task 051): token counts only. */
 export interface SessionContext {
   state: 'ok' | 'none'
@@ -395,6 +419,10 @@ export class HelmServer {
   /* ── agent usage limits (task 048) ── */
   usageLimits(focus = false) {
     return this.request<{ hosts: HostUsage[] }>('GET', `/api/usage/limits${focus ? '?focus=1' : ''}`)
+  }
+
+  usageReport(from: number, to: number) {
+    return this.request<UsageReport>('GET', `/api/usage/report?from=${from}&to=${to}`)
   }
 
   sessionContext(wsId: string, sessionId: string) {

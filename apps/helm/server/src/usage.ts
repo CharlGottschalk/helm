@@ -235,7 +235,8 @@ try {
   const parts = [u.input_tokens, u.cache_creation_input_tokens, u.cache_read_input_tokens].map(n)
   const size = n(c.context_window_size)
   if (process.env.HELM_CONTEXT_FILE && size && parts.some((p) => p !== undefined)) {
-    save(process.env.HELM_CONTEXT_FILE, { used: parts.reduce((a, p) => a + (p || 0), 0), size, pct: n(c.used_percentage) ?? null })
+    const sid = JSON.parse(input).session_id
+    save(process.env.HELM_CONTEXT_FILE, { used: parts.reduce((a, p) => a + (p || 0), 0), size, pct: n(c.used_percentage) ?? null, session: typeof sid === 'string' ? sid : null })
   }
 } catch {}
 try {

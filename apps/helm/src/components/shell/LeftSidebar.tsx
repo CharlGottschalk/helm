@@ -55,6 +55,7 @@ export function LeftSidebar() {
         <div className={s.groupLabel}>Navigate</div>
         <NavItem icon="grid" label="Command deck" active={activeTab.kind === 'dashboard'} collapsed={collapsed} onClick={actions.openDashboard} />
         <NavItem icon="brain" label="Brain" active={activeTab.kind === 'graph'} collapsed={collapsed} onClick={() => actions.openGraph()} />
+        <NavItem icon="pulse" label="Token usage" active={activeTab.kind === 'usage'} collapsed={collapsed} onClick={actions.openUsage} />
       </nav>
 
       <nav className={s.group} aria-label="Tools">

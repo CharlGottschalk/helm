@@ -49,6 +49,7 @@
     "check:oauth": "node server/test/oauth-check.mjs",
     "check:apps": "node server/test/apps-check.mjs",
     "check:usage": "node server/test/usage-check.mjs",
+    "check:usage-report": "node server/test/usage-report-check.mjs",
     "check:context": "node server/test/context-check.mjs"
   },
   "dependencies": {

@@ -34,7 +34,7 @@ const toProject = (wsId: string, p: TdtProject): Project => {
 }
 
 /* ── types ─────────────────────────────────────────────── */
-export type TabKind = 'dashboard' | 'chat' | 'graph' | 'project' | 'design' | 'tool' | 'terminal' | 'session' | 'record' | 'projectGraph'
+export type TabKind = 'dashboard' | 'chat' | 'graph' | 'project' | 'design' | 'tool' | 'terminal' | 'session' | 'record' | 'projectGraph' | 'usage'
 
 /** A tabbed tool instance (contracts/tool.md); settings follow contracts/settings.md. */
 export interface ToolInstance {
@@ -378,6 +378,8 @@ function useHelmStore() {
         if (query !== undefined) dispatch({ type: 'graphQuery', query })
         dispatch({ type: 'openTab', tab: { id: 'graph', kind: 'graph', title: 'Brain' } })
       },
+      /** Token usage report (task 050). */
+      openUsage: () => dispatch({ type: 'openTab', tab: { id: 'usage', kind: 'usage', title: 'Token usage' } }),
       openDesign: () => dispatch({ type: 'openTab', tab: { id: 'design', kind: 'design', title: 'Design system' } }),
       /** A linked project's file graph (tdt_project_graph); one tab per project. */
       openProjectGraph: (p: Project) =>
