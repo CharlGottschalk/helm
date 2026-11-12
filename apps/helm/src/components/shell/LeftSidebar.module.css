@@ -203,19 +203,6 @@
   background: var(--c-cyan-ghost);
 }
 
-.addForm input {
-  width: 100%;
-  height: 30px;
-  margin: 2px 0 6px;
-  padding: 0 var(--sp-3);
-  background: var(--c-well);
-  border: 1px solid var(--c-line-hot);
-  outline: none;
-  color: var(--c-text-0);
-  font-size: var(--fs-md);
-  box-shadow: var(--glow-cyan);
-}
-
 /* ── footer ── */
 .footer {
   display: flex;
@@ -465,7 +452,6 @@
 .projectItem,
 .wsButton,
 .wsOption,
-.addForm input,
 .collapseBtn,
 .addBtn {
   border-radius: var(--radius-sm);
