@@ -821,3 +821,12 @@ button.runItem:hover .runTitle {
   align-items: flex-start;
   gap: var(--sp-2);
 }
+/* bookmarks (046): tiles are links; long titles and hosts wrap inside the tile */
+a.quickTile {
+  text-decoration: none;
+}
+.quickTile .quickLabel,
+.quickTile .quickHint {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
