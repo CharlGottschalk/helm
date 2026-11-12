@@ -5,7 +5,7 @@
 
 Helm is a local Command Deck for [ThisDamnThing](https://usetdt.com) (TDT) workspaces.
 It has themes, and it shows a dashboard of widgets, tabbed tools, a brain graph, agent
-sessions and a workspace terminal. Helm runs a server on `127.0.0.1`, communicates with
+sessions with their usage limits, a token usage report and a workspace terminal. Helm runs a server on `127.0.0.1`, communicates with
 TDT through `tdt mcp serve`, and sends chat and builds to Claude Code or Codex. Helm
 never runs a model itself.
 

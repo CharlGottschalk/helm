@@ -46,6 +46,13 @@ to Holographic HUD. Select the theme again after you approve the update.
 To make your own theme, see
 [theme.md](../packages/sdk/docs/theme.md#theme-plugins) in the SDK contracts.
 
+## Your name
+
+Under **Your name** in the **Appearance** section, type the name Helm uses for you. It
+appears in the sidebar footer, your avatar's initials, the Command deck greeting and
+chat. The name stays in this browser and is never sent anywhere. Leave it empty to
+use **Operator**.
+
 ## Effects
 
 Under **Effects** in the **Appearance** section:
