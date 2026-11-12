@@ -18,8 +18,9 @@ Helm is in **beta**. Its features and configuration can change between releases.
 - [Brain graph](brain-graph.md): see and search your brain.
 - [Project graph](project-graph.md): see how a project's files relate, and generate the graph.
 - [Knowledge editor](knowledge-editor.md): read records and hand off edits.
-- [Sessions and chat](sessions.md): hand-offs, builds, the session view and terminals.
-- [Themes and appearance](themes.md): themes, effects and keyboard shortcuts.
+- [Sessions and chat](sessions.md): hand-offs, builds, the session view, terminals, usage
+  limits and the token usage report.
+- [Themes and appearance](themes.md): themes, your name, effects and keyboard shortcuts.
 
 ## Extend Helm
 
