@@ -10,6 +10,7 @@ import { mkdirSync, readFileSync, statSync, writeFileSync } from 'node:fs'
 import { homedir, platform } from 'node:os'
 import { join } from 'node:path'
 import { HELM_HOME, type HelmConfig, type HostId } from './config.js'
+import { CONTEXT_DIR } from './context.js'
 
 export interface UsageWindow {
   /** percent of the window's limit used, 0–100 */
@@ -216,21 +217,34 @@ export async function usageLimits(config: HelmConfig, focus: boolean): Promise<{
 
 /* ── Claude status line for Helm-started sessions ── */
 // Claude Code runs this with the session's status JSON on stdin. It saves only the rate-limit
-// numbers to HELM_USAGE_FILE, then prints the user's own status line (HELM_USER_STATUSLINE, run
+// numbers to HELM_USAGE_FILE and this session's context-window numbers to HELM_CONTEXT_FILE (task 051), then prints the user's own status line (HELM_USER_STATUSLINE, run
 // exactly as Claude would) or, without one, a short usage line.
 const SCRIPT = `import { readFileSync, renameSync, writeFileSync } from 'node:fs'
 import { spawnSync } from 'node:child_process'
 const input = readFileSync(0, 'utf8')
 let line = ''
+const save = (out, data) => {
+  const tmp = out + '.' + process.pid
+  writeFileSync(tmp, JSON.stringify(data), { mode: 0o600 })
+  renameSync(tmp, out)
+}
+try {
+  const c = JSON.parse(input).context_window || {}
+  const u = c.current_usage || {}
+  const n = (v) => (typeof v === 'number' && v >= 0 ? v : undefined)
+  const parts = [u.input_tokens, u.cache_creation_input_tokens, u.cache_read_input_tokens].map(n)
+  const size = n(c.context_window_size)
+  if (process.env.HELM_CONTEXT_FILE && size && parts.some((p) => p !== undefined)) {
+    save(process.env.HELM_CONTEXT_FILE, { used: parts.reduce((a, p) => a + (p || 0), 0), size, pct: n(c.used_percentage) ?? null })
+  }
+} catch {}
 try {
   const r = JSON.parse(input).rate_limits || {}
   const pick = (w) => { const p = w && (w.used_percentage ?? w.utilization); return typeof p === 'number' ? { pct: p, resetsAt: w.resets_at ?? null } : null }
   const data = { fiveHour: pick(r.five_hour), weekly: pick(r.seven_day) }
   const out = process.env.HELM_USAGE_FILE
   if (out && (data.fiveHour || data.weekly)) {
-    const tmp = out + '.' + process.pid
-    writeFileSync(tmp, JSON.stringify(data), { mode: 0o600 })
-    renameSync(tmp, out)
+    save(out, data)
     line = [data.fiveHour && '5h ' + Math.round(data.fiveHour.pct) + '%', data.weekly && 'week ' + Math.round(data.weekly.pct) + '%'].filter(Boolean).join(' · ')
   }
 } catch {}
@@ -241,10 +255,10 @@ else process.stdout.write(line)
 
 const quote = (p: string) => `"${p.replace(/(["\\$\`])/g, '\\$1')}"`
 
-/** `--settings` args and env for a Claude session, so its status line reports usage to Helm. */
-export function claudeStatusLine(): { args: string[]; env: Record<string, string> } {
+/** `--settings` args and env for a Claude session, so its status line reports usage (and, given the session id, its context window) to Helm. */
+export function claudeStatusLine(sessionId?: string): { args: string[]; env: Record<string, string> } {
   try {
-    mkdirSync(USAGE_DIR, { recursive: true, mode: 0o700 })
+    mkdirSync(CONTEXT_DIR, { recursive: true, mode: 0o700 })
     writeFileSync(STATUSLINE, SCRIPT, { mode: 0o600 })
   } catch (e) {
     console.warn(`[helm] usage status line unavailable: ${(e as Error).message}`)
@@ -259,5 +273,5 @@ export function claudeStatusLine(): { args: string[]; env: Record<string, string
     /* no user settings */
   }
   const settings = { statusLine: { type: 'command', command: `${quote(process.execPath)} ${quote(STATUSLINE)}` } }
-  return { args: ['--settings', JSON.stringify(settings)], env: { HELM_USAGE_FILE: LIVE_FILE, ...(user ? { HELM_USER_STATUSLINE: user } : {}) } }
+  return { args: ['--settings', JSON.stringify(settings)], env: { HELM_USAGE_FILE: LIVE_FILE, ...(sessionId ? { HELM_CONTEXT_FILE: join(CONTEXT_DIR, `${sessionId}.json`) } : {}), ...(user ? { HELM_USER_STATUSLINE: user } : {}) } }
 }

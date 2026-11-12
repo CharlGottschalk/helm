@@ -40,7 +40,7 @@ Helm never sends credentials to the browser, to a plugin or to a workspace.
 | `http.json` | Service profiles for HTTP connections |
 | `mcp.json` | MCP server profiles |
 | `sessions/` | Ended sessions (Helm keeps the last 200) |
-| `usage/` | Helm's Claude status line script and the last usage numbers it saved |
+| `usage/` | Helm's Claude status line script, the last usage numbers it saved, and each Claude session's context-window numbers (`usage/context/`) |
 | `plugins/` | Installed plugins and their approval state |
 
 Helm creates this folder so that only your user account can open it (mode 0700).

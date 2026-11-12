@@ -15,7 +15,7 @@ const SAMPLE: HostUsage[] = [
 ]
 const LABEL = { claude: 'Claude Code', codex: 'Codex' } as const
 
-const tone = (pct: number): Tone => (pct >= 90 ? 'red' : pct >= 75 ? 'amber' : 'cyan')
+export const usageTone = (pct: number): Tone => (pct >= 90 ? 'red' : pct >= 75 ? 'amber' : 'cyan')
 const pct = (w: UsageWindow | null) => (w ? `${Math.round(w.pct)}%` : '—')
 
 export function resetText(ms: number | null, now = Date.now()) {
@@ -89,7 +89,7 @@ function UsageRow({ u }: { u: HostUsage }) {
           <span>{LABEL[u.host]} · 5h</span>
           <span className={s.telemetryValue}>{pct(five)}</span>
         </span>
-        {five && <Meter value={five.pct} tone={tone(five.pct)} segments={30} />}
+        {five && <Meter value={five.pct} tone={usageTone(five.pct)} segments={30} />}
       </button>
       {u.state !== 'ok' && u.reason && <p className={s.usageNote}>{u.state === 'stale' ? `Last known. ${u.reason}` : u.reason}</p>}
       {open && (
@@ -99,7 +99,7 @@ function UsageRow({ u }: { u: HostUsage }) {
             <span>Week</span>
             <span className={s.telemetryValue}>{pct(u.weekly)}</span>
           </span>
-          {u.weekly && <Meter value={u.weekly.pct} tone={tone(u.weekly.pct)} segments={30} />}
+          {u.weekly && <Meter value={u.weekly.pct} tone={usageTone(u.weekly.pct)} segments={30} />}
           {u.weekly && <span className={s.usageNote}>{resetText(u.weekly.resetsAt)}</span>}
         </div>
       )}

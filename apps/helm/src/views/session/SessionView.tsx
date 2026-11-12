@@ -1,12 +1,13 @@
 // Detail view for an agent session (hand-off chat or orchestrated build).
 // "Live chat" is the host's own interactive UI in an embedded workspace terminal.
-import { useState } from 'react'
-import { Badge, Button, Icon, StatusDot } from '@helm/ui'
+import { useEffect, useState } from 'react'
+import { Badge, Button, Icon, Meter, StatusDot } from '@helm/ui'
 import type { Tone } from '@helm/ui'
 import { relTime } from '../../lib/util'
 import { server, useLoad, useServer, type AgentSession } from '@helm/client'
 import { MarkdownView } from '../../components/markdown/MarkdownView'
 import { useHelm } from '../../state/store'
+import { usageTone } from '../../components/shell/UsageTicker'
 import { TerminalPane } from '../terminal/TerminalView'
 import s from './SessionView.module.css'
 
@@ -49,6 +50,7 @@ export function SessionView({ sessionId }: { sessionId: string }) {
           <Badge tone={sessionTone[session.status]}>
             <StatusDot tone={sessionTone[session.status]} pulse={active} /> {session.status}
           </Badge>
+          <ContextMeter session={session} active={active} />
           <span className={s.stat}>started {relTime(session.startedAt)} ago</span>
           {session.terminalId && (
             <Button size="sm" variant={live ? 'subtle' : 'ghost'} icon="keyboard" onClick={() => setLive((v) => !v)}>
@@ -82,6 +84,32 @@ export function SessionView({ sessionId }: { sessionId: string }) {
           )}
         </section>
       </div>
+    </div>
+  )
+}
+
+const tokens = (n: number) =>
+  n >= 1e6 ? `${(n / 1e6).toFixed(1).replace(/\.0$/, '')}M` : n >= 1000 ? `${(n / 1000).toFixed(1).replace(/\.0$/, '')}k` : String(n)
+
+/** "Context 42.8k / 200k · 21%" (task 051): polled while the session runs, the last value after it ends. */
+function ContextMeter({ session, active }: { session: AgentSession; active: boolean }) {
+  const [tick, setTick] = useState(0)
+  useEffect(() => {
+    if (!active) return
+    const t = setInterval(() => setTick((n) => n + 1), 5000)
+    return () => clearInterval(t)
+  }, [active])
+  const ctx = useLoad(`${session.id}:${active ? tick : 'ended'}`, () => server.sessionContext(session.workspaceId, session.id))
+  const c = ctx.data
+  if (!c || c.state !== 'ok') {
+    const reason = ctx.error?.message ?? c?.reason ?? 'Checking…'
+    return <div className={s.context} title={reason}><span className={s.stat}>Context — · {reason}</span></div>
+  }
+  const pct = Math.round(c.pct)
+  return (
+    <div className={s.context} title={`${c.used.toLocaleString()} of ${c.size.toLocaleString()} tokens in context`}>
+      <span className={s.stat}>Context {tokens(c.used)} / {tokens(c.size)} · {pct}%</span>
+      <Meter value={c.pct} tone={usageTone(c.pct)} segments={16} />
     </div>
   )
 }

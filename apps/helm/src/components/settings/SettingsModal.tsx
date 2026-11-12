@@ -99,6 +99,17 @@ function SettingsDialogBody({ section, setSection }: { section: Section; setSect
                   </div>
                 </Group>
 
+                <Group label="Your name" hint="Shown in the sidebar, the command deck greeting and chat. It stays in this browser and is never sent anywhere. Leave empty for Operator.">
+                  <Input
+                    aria-label="Your name"
+                    value={state.settings.name ?? ''}
+                    maxLength={40}
+                    placeholder="Operator"
+                    onChange={(e) => actions.updateSettings({ name: e.target.value.trimStart() })}
+                    onBlur={(e) => actions.updateSettings({ name: e.target.value.trim() })}
+                  />
+                </Group>
+
                 <Group label="Effects">
                   <Toggle
                     label="Scanlines"

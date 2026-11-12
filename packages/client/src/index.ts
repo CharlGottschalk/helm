@@ -137,6 +137,16 @@ export interface HostUsage {
   updatedAt: number | null
 }
 
+/** Context window of one agent session (task 051): token counts only. */
+export interface SessionContext {
+  state: 'ok' | 'none'
+  reason?: string
+  used: number
+  size: number
+  pct: number
+  updatedAt: number | null
+}
+
 export interface LocalAppView {
   id: string
   name: string
@@ -385,6 +395,10 @@ export class HelmServer {
   /* ── agent usage limits (task 048) ── */
   usageLimits(focus = false) {
     return this.request<{ hosts: HostUsage[] }>('GET', `/api/usage/limits${focus ? '?focus=1' : ''}`)
+  }
+
+  sessionContext(wsId: string, sessionId: string) {
+    return this.request<SessionContext>('GET', `/api/workspaces/${encodeURIComponent(wsId)}/sessions/${encodeURIComponent(sessionId)}/context`)
   }
 
   /* ── local apps allowlist (task 045) ── */

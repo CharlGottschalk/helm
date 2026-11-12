@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { cx } from '../../lib/util'
 import { offline, server, useServer, type Loaded, type TdtProject, type Workspace } from '@helm/client'
 import { useToolTypes } from '@helm/widgets'
-import { useChromeTheme, useHelm } from '../../state/store'
+import { useChromeTheme, useHelm, useUserName } from '../../state/store'
 import { Icon, StatusDot, type IconName } from '@helm/ui'
 import { Logo } from './Logo'
 import { AddProjectDialog, AddWorkspaceDialog } from '../../views/onboarding/Onboarding'
@@ -19,6 +19,7 @@ export function LeftSidebar() {
   const { all: toolTypes } = useToolTypes()
   const collapsed = state.leftCollapsed
   const chrome = useChromeTheme()
+  const user = useUserName()
   const [adding, setAdding] = useState(false)
   const [offlineNote, setOfflineNote] = useState(false)
 
@@ -108,9 +109,9 @@ export function LeftSidebar() {
       </div>
 
       <div className={s.footer}>
-        <span className={s.avatar}>OP</span>
+        <span className={s.avatar}>{user.initials}</span>
         <div className={s.footerText}>
-          <span className={s.footerName}>Operator</span>
+          <span className={s.footerName} title={user.name}>{user.name}</span>
           <span className={s.footerStatus}>
             {serverStatus === 'online' ? (
               <><StatusDot tone="green" /> Online · {ws.kind}</>
