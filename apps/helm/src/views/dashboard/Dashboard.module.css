@@ -24,6 +24,7 @@
   letter-spacing: 0.02em;
   line-height: 1;
   color: var(--c-text-0);
+  overflow-wrap: anywhere;
 }
 .headerRight {
   display: flex;

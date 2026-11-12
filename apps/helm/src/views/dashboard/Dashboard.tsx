@@ -5,7 +5,7 @@ import { compactLayout, findSlot, typeOf, type GridItem } from '../../lib/gridLa
 import { uid } from '../../lib/util'
 import { requiredMissing, resolveSettings, type SettingValues } from '@usetdt/helm-sdk'
 import { useOptionsResolver } from '../../services/options'
-import { DEFAULT_LAYOUT, useHelm } from '../../state/store'
+import { DEFAULT_LAYOUT, useHelm, useUserName } from '../../state/store'
 import { DashboardGrid, type WidgetDef } from './DashboardGrid'
 import { useWidgetTypes } from '@helm/widgets'
 import { WidgetLibrary } from './WidgetLibrary'
@@ -19,6 +19,7 @@ interface Toast {
 export function Dashboard() {
   const { state, ws, actions } = useHelm()
   const layout = state.layouts[state.wsId] ?? DEFAULT_LAYOUT
+  const { name: userName } = useUserName()
   const resolveOptions = useOptionsResolver()
   const { find: widgetType } = useWidgetTypes()
   /** settings dialog target: an existing instance, or a type being added */
@@ -108,7 +109,7 @@ export function Dashboard() {
           <div>
             <span className="hud-label">Command deck · {ws.name}</span>
             <h1 className={s.greeting}>
-              {greeting}, <span className="glow-text">Operator</span>
+              {greeting}, <span className="glow-text">{userName}</span>
             </h1>
           </div>
           <div className={s.headerRight}>

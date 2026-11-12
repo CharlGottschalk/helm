@@ -4,7 +4,7 @@ import type { Tone } from '@helm/ui'
 import { chromeTheme, themes as builtinThemes, type ThemeId } from '@helm/ui'
 import type { SettingValues } from '@usetdt/helm-sdk'
 import type { GridItem } from '../lib/gridLayout'
-import { uid } from '../lib/util'
+import { initials, uid } from '../lib/util'
 
 const { projects: seedProjects } = offline
 
@@ -82,6 +82,8 @@ export interface Settings {
   host: HostId
   /** the right rail's 5-hour/weekly usage tickers (task 048); off stops their requests */
   usageLimits: boolean
+  /** the user's display name (task 049); browser-only, empty means "Operator" */
+  name: string
 }
 
 interface State {
@@ -163,7 +165,7 @@ const seedChats: Chat[] = [
 
 function initialState(): State {
   const base: State = {
-    settings: { theme: 'hud', scanlines: true, reduceMotion: false, host: 'claude', usageLimits: true },
+    settings: { theme: 'hud', scanlines: true, reduceMotion: false, host: 'claude', usageLimits: true, name: '' },
     wsId: offline.workspaces[0].id,
     tabSets: {},
     leftCollapsed: false,
@@ -181,6 +183,7 @@ function initialState(): State {
     if (!raw) return base
     const saved = JSON.parse(raw) as Partial<State>
     const merged = { ...base, ...saved, settings: { ...base.settings, ...saved.settings } }
+    merged.settings.name = String(merged.settings.name ?? '').trim().slice(0, 40)
     // any reply interrupted by a reload is considered finished
     for (const chat of Object.values(merged.chats)) {
       for (const m of chat.messages) if (m.status !== 'done') m.status = 'done'
@@ -511,6 +514,12 @@ export function useHelm() {
   const v = useContext(Ctx)
   if (!v) throw new Error('useHelm must be used inside <HelmProvider>')
   return v
+}
+
+/** The user's display name and avatar initials; "Operator" / "OP" until set in Settings (task 049). */
+export function useUserName() {
+  const name = useHelm().state.settings.name?.trim()
+  return name ? { name, initials: initials(name) } : { name: 'Operator', initials: 'OP' }
 }
 
 /** data-theme for rail elements (sidebars, tab bar, chat dock) when the active theme has a separate chrome sub-theme. */

@@ -17,7 +17,7 @@ export interface HostAdapter {
   /** how skills are invoked in this host: "/skill" for Claude, "$skill" for Codex */
   skillSigil: '/' | '$'
   /** interactive session, optionally seeded with a first prompt */
-  interactive(prompt?: string): HostLaunch
+  interactive(prompt?: string, sessionId?: string): HostLaunch
   /** text that invokes a skill with arguments */
   skill(name: string, args?: string): string
   // TODO(headless): non-interactive mode for richer status/streaming in Helm's own
@@ -29,9 +29,9 @@ export function hostAdapters(config: HelmConfig): Record<HostId, HostAdapter> {
     id,
     label,
     skillSigil: sigil,
-    interactive: (prompt) => {
-      // Claude sessions get Helm's status line, which reports usage limits (usage.ts) and still prints the user's own.
-      const extra = id === 'claude' ? claudeStatusLine() : { args: [], env: {} }
+    interactive: (prompt, sessionId) => {
+      // Claude sessions get Helm's status line, which reports usage limits and the session's context window (usage.ts) and still prints the user's own.
+      const extra = id === 'claude' ? claudeStatusLine(sessionId) : { args: [], env: {} }
       // Both CLIs accept an initial prompt as a positional argument and stay interactive.
       return { command: config.hosts[id], args: [...extra.args, ...(prompt ? [prompt] : [])], title: label, env: extra.env }
     },

@@ -24,12 +24,19 @@
 }
 .meta {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: var(--sp-3);
 }
 .meta span span {
   width: 5px;
   height: 5px;
+}
+.context {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  max-width: 100%;
 }
 .stat {
   font-family: var(--font-mono);

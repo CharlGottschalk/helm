@@ -235,6 +235,9 @@
   color: var(--c-text-0);
   font-size: var(--fs-md);
   font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .footerStatus {
   display: flex;

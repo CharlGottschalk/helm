@@ -41,6 +41,18 @@ The **Sessions** panel on the right lists your sessions. To show or hide it, cli
 
 The **N live** badge counts the sessions that are running or waiting.
 
+## Context window
+
+The header of a session Helm started shows how full the agent's context window is,
+for example **Context 42.8k / 200k · 21%**. The meter turns amber at 75% and red at 90%.
+
+- **Claude Code:** Helm's status line saves the session's token count after each response.
+- **Codex:** Helm reads the latest token count in the session's own Codex log
+  (`~/.codex/sessions`). Only numbers reach the browser, never messages.
+
+Before the first response, or when there is no source, it shows **Context —** with the
+reason. An ended session keeps its last value. Sessions started outside Helm don't show it.
+
 ## Usage limits
 
 The bottom of the Sessions panel shows how much of your Claude Code and Codex plan

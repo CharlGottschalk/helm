@@ -4,7 +4,7 @@ import { Badge, Button, Icon, StatusDot } from '@helm/ui'
 import { Logo } from '../../components/shell/Logo'
 import { HostPicker, suggestions } from '../../components/chat/HostPicker'
 import { cx } from '../../lib/util'
-import { isStreaming, useHelm, type Message } from '../../state/store'
+import { isStreaming, useHelm, useUserName, type Message } from '../../state/store'
 import s from './ChatView.module.css'
 
 export function ChatView({ chatId }: { chatId: string }) {
@@ -138,12 +138,13 @@ export function ChatView({ chatId }: { chatId: string }) {
 
 function MessageRow({ message }: { message: Message }) {
   const user = message.role === 'user'
+  const me = useUserName()
   return (
     <div className={cx(s.msg, user ? s.user : s.assistant)}>
-      <div className={s.avatar}>{user ? 'OP' : <Logo size={20} />}</div>
+      <div className={s.avatar}>{user ? me.initials : <Logo size={20} />}</div>
       <div className={s.bubble}>
         <div className={s.msgHead}>
-          <span>{user ? 'Operator' : 'Helm'}</span>
+          <span>{user ? me.name : 'Helm'}</span>
           <span className={s.msgTime}>{new Date(message.at).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}</span>
         </div>
         {message.status === 'thinking' ? (

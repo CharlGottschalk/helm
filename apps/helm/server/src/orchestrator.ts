@@ -26,9 +26,8 @@ export class Orchestrator {
     const text = prompt.trim()
     if (!text || text.length > 8000) throw new ApiError(400, 'Prompt must be 1–8000 characters')
     const adapter = this.hosts[host]
-    const launch = adapter.interactive(text)
     const session = this.sessions.create({ workspaceId: ws.id, kind: 'chat', host, title: titleFrom(text), prompt: text })
-    return this.launch(ws, session.id, launch)
+    return this.launch(ws, session.id, adapter.interactive(text, session.id))
   }
 
   /**
@@ -50,7 +49,7 @@ export class Orchestrator {
       prompt,
       task: { projectId: input.projectId, taskId: input.taskId },
     })
-    return this.launch(ws, session.id, adapter.interactive(prompt))
+    return this.launch(ws, session.id, adapter.interactive(prompt, session.id))
   }
 
   private async launch(ws: WorkspaceEntry, sessionId: string, launch: { command: string; args: string[]; title: string; env?: Record<string, string> }) {

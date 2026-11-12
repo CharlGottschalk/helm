@@ -25,6 +25,7 @@ import { getWorkspace, looksLikeTdtWorkspace } from './workspaces.js'
 import { addWorkspace, createFolder, installTdt, listFolder, tdtStatus } from './onboarding.js'
 import { launchApp, listApps, removeApp, saveApp } from './apps.js'
 import { usageLimits } from './usage.js'
+import { sessionContext } from './context.js'
 
 const config = loadConfig()
 const port = Number(process.env.HELM_PORT ?? config.port)
@@ -193,6 +194,14 @@ route('POST', '/api/workspaces/:ws/plugins/:name', async (req, p) =>
 route('POST', '/api/workspaces/:ws/extensions/frame', async (req, p) => createFrame(getWorkspace(config, p.ws), await readJson(req)))
 
 route('GET', '/api/workspaces/:ws/sessions', async (_req, p) => sessions.list(getWorkspace(config, p.ws).id))
+
+// Context window of one session (task 051): token counts only.
+route('GET', '/api/workspaces/:ws/sessions/:id/context', async (_req, p) => {
+  const ws = getWorkspace(config, p.ws)
+  const s = sessions.get(p.id)
+  if (!s || s.workspaceId !== ws.id) throw new ApiError(404, 'Session not found')
+  return sessionContext(s, ws.path)
+})
 
 route('POST', '/api/workspaces/:ws/sessions/handoff', async (req, p) => {
   const body = await readJson(req)
