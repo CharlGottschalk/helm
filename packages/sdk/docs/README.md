@@ -53,5 +53,6 @@ bridge in [widget.md](widget.md#bridge).
 
 | SDK version | Changes |
 | --- | --- |
+| 0.3.0 | Settings: the `list` field type (repeatable entries, `LIST_MAX` 50), the `when` condition that shows a field only for chosen sibling values, `suggestions` on `text` fields, and `isShown`; [settings.md](settings.md) and `settings.schema.json`. A plugin that uses these needs SDK 0.3.0 or later. |
 | 0.2.0 | Theme plugins: the `helm.themes` field in [plugin.md](plugin.md) and `plugin.schema.json`, the theme plugin rules in [theme.md](theme.md), `validateTheme`, and `helm-sdk create theme`. A theme plugin needs SDK 0.2.0 or later. |
 | 0.1.0 | First version: widget, tool, settings, connection, theme token, kit, plugin and React contracts, the typed bridge and `helm-sdk create`, `build`, `validate` and `dev`. |
