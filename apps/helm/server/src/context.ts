@@ -169,3 +169,26 @@ function codexContext(s: Session, cwd: string): SessionContext {
 export function sessionContext(s: Session, cwd: string): SessionContext {
   return s.host === 'claude' ? claudeContext(s) : codexContext(s, cwd)
 }
+
+/**
+ * Host session id → Helm session id for the sessions Helm started, so the usage report (task 050)
+ * can link to them. Claude: the id its status line saved; Codex: the matched rollout's session id.
+ */
+export function hostSessionIds(list: { s: Session; cwd: string }[]): Map<string, string> {
+  const out = new Map<string, string>()
+  for (const { s, cwd } of list) {
+    try {
+      if (s.host === 'claude') {
+        const id = obj(JSON.parse(readFileSync(join(CONTEXT_DIR, `${s.id}.json`), 'utf8'))).session
+        if (typeof id === 'string') out.set(`claude:${id}`, s.id)
+      } else {
+        const file = findRollout(s, cwd)
+        const id = file && obj(obj(JSON.parse(readHead(file).split('\n')[0])).payload).id
+        if (typeof id === 'string') out.set(`codex:${id}`, s.id)
+      }
+    } catch {
+      /* not recorded */
+    }
+  }
+  return out
+}

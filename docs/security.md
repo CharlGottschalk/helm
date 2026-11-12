@@ -60,6 +60,13 @@ To show your plan's usage limits (see [Sessions](sessions.md#usage-limits)), Hel
 To stop all of this, turn off **Show agent usage limits** in **Settings →
 Appearance**.
 
+## Token usage report
+
+The [token usage report](sessions.md#token-usage) reads Claude Code's and Codex's
+transcript files on this machine. It only reads them and makes no network requests.
+The server keeps only token counts, times, model names, session IDs and the
+project's folder name. Message text and file paths never reach the browser.
+
 ## Plugins
 
 Plugins run in a sandboxed frame. A plugin cannot send network requests or read your

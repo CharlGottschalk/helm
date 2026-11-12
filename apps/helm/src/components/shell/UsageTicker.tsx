@@ -31,7 +31,7 @@ export function resetText(ms: number | null, now = Date.now()) {
 }
 
 export function UsageTicker() {
-  const { state, online } = useHelm()
+  const { state, online, actions } = useHelm()
   const on = state.settings.usageLimits
   const [hosts, setHosts] = useState<HostUsage[] | null>(null)
   const [error, setError] = useState<string | null>(null)
@@ -65,6 +65,9 @@ export function UsageTicker() {
       <div className={s.telemetryRow}>
         <span>Usage limits</span>
         {!online && <Badge tone="amber">Sample data</Badge>}
+        <button type="button" className={s.usageLink} onClick={actions.openUsage} title="Open the token usage report">
+          Report
+        </button>
       </div>
       {rows.map((u) => (
         <UsageRow key={u.host} u={u} />

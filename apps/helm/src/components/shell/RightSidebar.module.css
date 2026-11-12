@@ -335,3 +335,15 @@
 .run {
   border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
 }
+/* ticker → token usage report (task 050) */
+.usageLink {
+  font: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+  color: var(--c-cyan);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.usageLink:hover {
+  color: var(--c-text-0);
+}

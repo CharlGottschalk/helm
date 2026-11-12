@@ -25,7 +25,8 @@ import { getWorkspace, looksLikeTdtWorkspace } from './workspaces.js'
 import { addWorkspace, createFolder, installTdt, listFolder, tdtStatus } from './onboarding.js'
 import { launchApp, listApps, removeApp, saveApp } from './apps.js'
 import { usageLimits } from './usage.js'
-import { sessionContext } from './context.js'
+import { usageReport } from './usage-report.js'
+import { hostSessionIds, sessionContext } from './context.js'
 
 const config = loadConfig()
 const port = Number(process.env.HELM_PORT ?? config.port)
@@ -177,6 +178,20 @@ route('DELETE', '/api/apps/:id', async (_req, p) => removeApp(decodeURIComponent
 route('POST', '/api/apps/:id/launch', async (_req, p) => launchApp(decodeURIComponent(p.id)))
 // Agent usage limits (task 048): percentages and reset times only; `?focus=1` allows an earlier check.
 route('GET', '/api/usage/limits', async (req) => usageLimits(config, new URL(req.url ?? '/', 'http://localhost').searchParams.get('focus') === '1'))
+// Token usage report (task 050): totals from this machine's Claude Code and Codex transcripts, numbers only.
+route('GET', '/api/usage/report', async (req) => {
+  const q = new URL(req.url ?? '/', 'http://localhost').searchParams
+  const from = Number(q.get('from'))
+  const to = Number(q.get('to'))
+  if (!Number.isFinite(from) || !Number.isFinite(to) || to <= from || to - from > 400 * 86_400_000) throw new ApiError(400, 'from and to must be epoch ms, up to 400 days apart')
+  const report = usageReport(from, to)
+  const helm = hostSessionIds(config.workspaces.flatMap((ws) => sessions.list(ws.id).map((s) => ({ s, cwd: ws.path }))))
+  for (const u of report.sessions) {
+    const s = sessions.get(helm.get(`${u.host}:${u.id}`) ?? '')
+    if (s) u.helm = { id: s.id, wsId: s.workspaceId, title: s.title }
+  }
+  return report
+})
 route('GET', '/api/mcp/servers', async () => listMcpServers())
 route('POST', '/api/mcp/servers', async (req) => saveMcpServer(await readJson(req)))
 route('DELETE', '/api/mcp/servers/:name', async (_req, p) => removeMcpServer(decodeURIComponent(p.name)))

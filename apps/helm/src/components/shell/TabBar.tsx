@@ -14,6 +14,7 @@ const tabIcon: Record<TabKind, IconName> = {
   session: 'spark',
   record: 'doc',
   projectGraph: 'layers',
+  usage: 'pulse',
 }
 
 export function TabBar() {

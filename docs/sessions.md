@@ -84,6 +84,36 @@ To turn the usage limits off, open **Settings → Appearance** and turn off **Sh
 agent usage limits**. Helm then stops asking the hosts. Offline, the panel shows
 sample values, marked **Sample data**.
 
+## Token usage
+
+**Token usage** (in the left sidebar, or **Report** next to the usage limits) shows
+how many tokens Claude Code and Codex used on this machine. It counts every session,
+not only the ones that Helm started.
+
+- Choose **Day**, **Week** or **Month**, and use **‹** and **›** to go to earlier
+  periods. Weeks start on Monday. In **Day**, use **Yesterday** or pick any date.
+  In **Week** and **Month**, click a day's bar to open that day.
+- **New tokens** is the main number: fresh input, cache writes and output.
+- **Cache reads** are counted separately. They are earlier context that the host
+  sends again with each request, so they are usually far larger than everything
+  else.
+- The list shows the heaviest **Sessions**, **Projects** or **Models** first.
+  Projects are shown by folder name. A session that Helm started links to its
+  session view.
+
+The numbers come from the hosts' own transcript files:
+
+| Host | Files |
+| --- | --- |
+| Claude Code | `~/.claude/projects/` (or `$CLAUDE_CONFIG_DIR/projects/`), including subagents |
+| Codex | `~/.codex/sessions/` and `~/.codex/archived_sessions/` (or under `$CODEX_HOME`) |
+
+Claude Code writes one response on several lines, and a resumed session copies
+earlier responses, so Helm counts each response once. A session whose transcript
+was deleted no longer appears. Lines that Helm cannot read are skipped, and the
+report says how many. Costs are not shown. Offline, the report shows sample
+values, marked **Sample data**.
+
 ## Session status
 
 | Status | Meaning |
