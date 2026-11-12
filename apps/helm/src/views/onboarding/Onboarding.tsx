@@ -214,29 +214,7 @@ function FolderStep({ onDone }: { onDone?: () => void }) {
 
       {listing && (
         <>
-          <nav className={s.crumbs} aria-label="Folder path">
-            {listing.crumbs.map((c, i) => (
-              <span key={c.path} className={s.crumb}>
-                {i > 0 && <Icon name="chevR" size={12} />}
-                <button onClick={() => open(c.path)} aria-current={i === listing.crumbs.length - 1 ? 'location' : undefined}>{c.name}</button>
-              </span>
-            ))}
-            <button className={s.home} onClick={() => open(listing.home)} title="Home folder">~</button>
-          </nav>
-          <ul className={s.folders} aria-label="Folders">
-            {listing.parent && (
-              <li><button onClick={() => open(listing.parent!)}><Icon name="chevL" size={14} /> ..</button></li>
-            )}
-            {listing.folders.map((f) => (
-              <li key={f.path}>
-                <button onClick={() => open(f.path)}>
-                  <Icon name="folder" size={14} /> <span className={s.fname}>{f.name}</span>
-                  {f.workspace && <Badge tone="cyan">Workspace</Badge>}
-                </button>
-              </li>
-            ))}
-            {!listing.folders.length && <li className={s.muted}>No folders here.</li>}
-          </ul>
+          <FolderBrowser listing={listing} open={open} />
           <form className={s.row} onSubmit={mkdir}>
             <Input value={newName} onChange={(e) => setNewName(e.target.value)} placeholder="New folder name" aria-label="New folder name" icon="plus" />
             <Button type="submit" disabled={!newName.trim()}>New folder</Button>
@@ -261,5 +239,88 @@ function FolderStep({ onDone }: { onDone?: () => void }) {
       {busy && <p className={s.muted} role="status">{busy}</p>}
       {error && <pre className={cx(s.output, s.errorOut)} role="alert">{error}</pre>}
     </section>
+  )
+}
+
+/** Breadcrumbs and subfolders of one listing: the workspace step and the project picker share it. */
+function FolderBrowser({ listing, open }: { listing: FolderListing; open: (path: string) => void }) {
+  return (
+    <>
+      <nav className={s.crumbs} aria-label="Folder path">
+        {listing.crumbs.map((c, i) => (
+          <span key={c.path} className={s.crumb}>
+            {i > 0 && <Icon name="chevR" size={12} />}
+            <button onClick={() => open(c.path)} aria-current={i === listing.crumbs.length - 1 ? 'location' : undefined}>{c.name}</button>
+          </span>
+        ))}
+        <button className={s.home} onClick={() => open(listing.home)} title="Home folder">~</button>
+      </nav>
+      <ul className={s.folders} aria-label="Folders">
+        {listing.parent && (
+          <li><button onClick={() => open(listing.parent!)}><Icon name="chevL" size={14} /> ..</button></li>
+        )}
+        {listing.folders.map((f) => (
+          <li key={f.path}>
+            <button onClick={() => open(f.path)}>
+              <Icon name="folder" size={14} /> <span className={s.fname}>{f.name}</span>
+              {f.workspace && <Badge tone="cyan">Workspace</Badge>}
+            </button>
+          </li>
+        ))}
+        {!listing.folders.length && <li className={s.muted}>No folders here.</li>}
+      </ul>
+    </>
+  )
+}
+
+/** Projects "+" (task 047): pick a project folder, then hand off /tdt-add-project with it. Helm registers nothing itself. */
+export function AddProjectDialog({ onClose }: { onClose: () => void }) {
+  const modal = useModal(onClose)
+  const { actions, state } = useHelm()
+  const [listing, setListing] = useState<FolderListing | null>(null)
+  const [error, setError] = useState('')
+  const open = useCallback((path?: string) => {
+    setError('')
+    server.listFolder(path).then(setListing, (e: Error) => setError(e.message))
+  }, [])
+  useEffect(() => open(), [open])
+
+  const choose = () => {
+    if (!listing) return
+    // The path is data in the prompt, quoted so spaces survive; JSON only when it holds a quote (keeps Windows backslashes single).
+    const quoted = listing.path.includes('"') ? JSON.stringify(listing.path) : `"${listing.path}"`
+    const sigil = state.settings.host === 'codex' ? '$' : '/' // Codex invokes skills as $skill
+    actions.handoff(`${sigil}tdt-add-project ${quoted}`)
+    onClose()
+  }
+
+  return (
+    <dialog className={cx('hud-modal', s.overlay)} aria-labelledby="add-project-title" {...modal}>
+      <div className={s.card}>
+        <button className={s.close} onClick={onClose} aria-label="Close">
+          <Icon name="x" size={16} />
+        </button>
+        <header className={s.header}>
+          <span className="hud-label">Helm · add a project</span>
+          <h1 id="add-project-title" className={s.title}>Add a project</h1>
+          <p className={s.lede}>Pick the project's folder. Helm starts a session that runs <code>/tdt-add-project</code> on it, and TDT registers the project.</p>
+        </header>
+        <section className={s.step} aria-label="Project folder">
+          {listing && (
+            <>
+              <FolderBrowser listing={listing} open={open} />
+              <div className={s.selected}>
+                <div className={s.row}>
+                  <Button variant="primary" icon="arrow" onClick={choose}>Add this folder</Button>
+                  <Button variant="ghost" onClick={onClose}>Cancel</Button>
+                </div>
+                <p className={s.muted}><code>{listing.path}</code></p>
+              </div>
+            </>
+          )}
+          {error && <pre className={cx(s.output, s.errorOut)} role="alert">{error}</pre>}
+        </section>
+      </div>
+    </dialog>
   )
 }

@@ -110,7 +110,6 @@ type Action =
   | { type: 'patchMessage'; chatId: string; messageId: string; patch?: Partial<Message>; append?: string }
   | { type: 'toggleTask'; id: string }
   | { type: 'addNote'; note: Note }
-  | { type: 'addProject'; project: Project }
   | { type: 'graphQuery'; query: string }
   | { type: 'layout'; wsId: string; layout: GridItem[] }
   | { type: 'tool'; tool: ToolInstance }
@@ -247,8 +246,6 @@ function reducer(state: State, action: Action): State {
       return { ...state, doneTasks: { ...state.doneTasks, [action.id]: !state.doneTasks[action.id] } }
     case 'addNote':
       return { ...state, userNotes: [action.note, ...state.userNotes] }
-    case 'addProject':
-      return { ...state, userProjects: [...state.userProjects, action.project] }
     case 'graphQuery':
       return { ...state, graphQuery: action.query }
     case 'layout':
@@ -431,16 +428,6 @@ function useHelmStore() {
           type: 'addNote',
           note: { id: uid('n'), wsId: stateRef.current.wsId, kind: 'note', title, excerpt: 'Quick capture', projectIds: [], conceptIds: [], personIds: [], updated: Date.now() },
         }),
-      addProject: (name: string) => {
-        const wsId = stateRef.current.wsId
-        const project: Project = {
-          id: uid('pr-'), wsId, name, code: name.replace(/[^a-z]/gi, '').slice(0, 3).toUpperCase() || 'NEW',
-          status: 'active', health: 100, progress: 0, description: 'Newly registered project.',
-          ownerId: '', teamIds: [], stack: [],
-        }
-        dispatch({ type: 'addProject', project })
-        return project
-      },
       setGraphQuery: (query: string) => dispatch({ type: 'graphQuery', query }),
       /** Open a tool tab. Single-instance tools reuse their instance; multi tools get a new one. */
       openTool: (type: string, name: string, opts: { multi?: boolean; settings?: SettingValues } = {}) => {

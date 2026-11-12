@@ -1,14 +1,16 @@
-import { useEffect, useRef, useState, type FormEvent } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { cx } from '../../lib/util'
 import { offline, server, useServer, type Loaded, type TdtProject, type Workspace } from '@helm/client'
 import { useToolTypes } from '@helm/widgets'
 import { useChromeTheme, useHelm } from '../../state/store'
 import { Icon, StatusDot, type IconName } from '@helm/ui'
 import { Logo } from './Logo'
-import { AddWorkspaceDialog } from '../../views/onboarding/Onboarding'
+import { AddProjectDialog, AddWorkspaceDialog } from '../../views/onboarding/Onboarding'
 import s from './LeftSidebar.module.css'
 
 const { statusTone } = offline
+
+const OFFLINE_ADD = 'Adding a project needs the Helm server and TDT'
 
 const availabilityTone = { available: 'green', 'missing or moved': 'amber', archived: 'neutral' } as const
 
@@ -18,7 +20,7 @@ export function LeftSidebar() {
   const collapsed = state.leftCollapsed
   const chrome = useChromeTheme()
   const [adding, setAdding] = useState(false)
-  const [draft, setDraft] = useState('')
+  const [offlineNote, setOfflineNote] = useState(false)
 
   /** New workspace terminal; offline opens a tab explaining how to start the server. */
   const openTerminal = async () => {
@@ -30,15 +32,6 @@ export function LeftSidebar() {
     } catch {
       actions.openTerminal('offline')
     }
-  }
-
-  const register = (e: FormEvent) => {
-    e.preventDefault()
-    if (!draft.trim()) return
-    const p = actions.addProject(draft.trim())
-    actions.openProject(p)
-    setDraft('')
-    setAdding(false)
   }
 
   return (
@@ -83,18 +76,16 @@ export function LeftSidebar() {
           Projects <span className={s.count}>{projects.length.toString().padStart(2, '0')}</span>
           <button
             className={s.addBtn}
-            onClick={() => setAdding((a) => !a)}
-            disabled={online}
-            title={online ? 'Register projects with /tdt-add-project (Helm is read-only)' : 'Register project'}
+            onClick={() => (online ? setAdding(true) : setOfflineNote((n) => !n))}
+            aria-disabled={!online}
+            aria-label="Add a project"
+            title={online ? 'Add a project: pick its folder, then /tdt-add-project registers it' : OFFLINE_ADD}
           >
-            <Icon name={adding ? 'x' : 'plus'} size={12} />
+            <Icon name="plus" size={12} />
           </button>
         </div>
-        {adding && !collapsed && (
-          <form onSubmit={register} className={s.addForm}>
-            <input autoFocus value={draft} onChange={(e) => setDraft(e.target.value)} placeholder="Project name ↵" onKeyDown={(e) => e.key === 'Escape' && setAdding(false)} />
-          </form>
-        )}
+        {!online && offlineNote && !collapsed && <p className={s.railNote} role="status">{OFFLINE_ADD}. Start it with <code>helm</code>.</p>}
+        {adding && <AddProjectDialog onClose={() => setAdding(false)} />}
         {!collapsed && online && <ProjectsState ws={ws} load={projectsLoad} empty={projects.length === 0} />}
         <ul className={s.projectList}>
           {projects.map((p) => {
