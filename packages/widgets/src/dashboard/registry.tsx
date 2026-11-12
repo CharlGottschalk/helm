@@ -5,6 +5,7 @@ import type { IconName } from '@helm/ui'
 import type { ConnectionDecl, ListItem, SettingField, SettingValues, WidgetCapability, WidgetCategory } from '@usetdt/helm-sdk'
 import { FocusTimerWidget } from './focusTimer'
 import { QuickActionsWidget, quickActionSettings } from './quickActions'
+import { BookmarksWidget, bookmarkSettings } from './bookmarks'
 import { LiveActivityWidget, LiveAgentRunsWidget, LiveBrainRadarWidget, LiveCalendarWidget, LiveHealthWidget, LiveKpiWidget, LiveNotesWidget, LiveProjectSpotlightWidget, LiveSessionsWidget, LiveReviewQueueWidget, LiveStacksWidget, LiveRelaysWidget, LiveInterviewsWidget } from './live'
 import { useWidgetHost } from '../host'
 import type { ComponentType } from 'react'
@@ -113,6 +114,10 @@ export const widgetTypes: WidgetType[] = [
   { type: 'quick', title: 'Quick actions', code: 'W-11', icon: 'grid', category: 'Utility', description: 'Buttons you choose: run a skill in a new session, open a tool, a Helm function or a local app. Add one per set of buttons.', w: 3, h: 3, minW: 2, minH: 2, multi: true,
     settings: quickActionSettings, connections: [tdt('tdt_skill_list', 'tdt_project_list')],
     render: (_i, s, ctx) => <QuickActionsWidget buttons={(s.buttons as ListItem[] | undefined) ?? []} openSettings={ctx?.openSettings} /> },
+  // works offline: links only, no favicon fetch or other outbound request
+  { type: 'bookmarks', title: 'Bookmarks', code: 'W-17', icon: 'link', category: 'Utility', description: 'Websites you bookmark. Each opens in a new browser tab. Add one per set of links.', w: 3, h: 3, minW: 2, minH: 2, multi: true,
+    settings: bookmarkSettings,
+    render: (_i, s, ctx) => <BookmarksWidget bookmarks={(s.bookmarks as ListItem[] | undefined) ?? []} openSettings={ctx?.openSettings} /> },
 ]
 
 export const widgetType = (type: string) => widgetTypes.find((t) => t.type === type)
