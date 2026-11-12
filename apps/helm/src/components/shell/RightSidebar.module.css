@@ -232,6 +232,36 @@
 .telemetryValue {
   color: var(--c-text-1);
 }
+.usage {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.usageBtn {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 100%;
+  padding: 0;
+  text-align: left;
+  cursor: pointer;
+}
+.usageBtn:focus-visible {
+  outline: 1px solid var(--c-cyan);
+  outline-offset: 2px;
+}
+.usageDetail {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding-left: var(--sp-2);
+  border-left: 1px solid var(--c-line);
+}
+.usageNote {
+  margin: 0;
+  font-size: var(--fs-2xs);
+  color: var(--c-text-3);
+}
 
 /* collapsed rail */
 .collapsed {

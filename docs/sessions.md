@@ -41,8 +41,36 @@ The **Sessions** panel on the right lists your sessions. To show or hide it, cli
 
 The **N live** badge counts the sessions that are running or waiting.
 
-The **Context window** and **Tokens today** values at the bottom of the panel are
-examples. They do not show your real usage.
+## Usage limits
+
+The bottom of the Sessions panel shows how much of your Claude Code and Codex plan
+limits you have used:
+
+- Each host shows its **5-hour** window as a percentage, with a meter.
+- Point to a host, or click it, to see the **weekly** window and when each window
+  resets.
+- The meter turns amber at 75% and red at 90%.
+
+These are percentages of your plan's limit, not token counts. They come from the
+hosts themselves:
+
+| Host | Source | How often |
+| --- | --- | --- |
+| Claude Code | Claude's usage service, with Claude Code's own login | Every 15 minutes, and when you return to Helm after 5 minutes |
+| Claude Code, in a session that Helm started | The numbers Claude Code gives the session's status line | Within seconds, while the session runs |
+| Codex | `codex app-server` | Every 5 minutes, and when you return to Helm after 1 minute |
+
+Helm never signs in for you and never changes your Claude Code login. If that login
+has expired, Helm shows the last known values until Claude Code next runs and renews
+it. A host that is not installed or not signed in shows **—** with the reason.
+
+Sessions that Helm starts with Claude Code use Helm's status line. It saves the usage
+numbers, then shows your own status line from `~/.claude/settings.json` if you have
+one. Status lines set in a project's settings are not shown in these sessions.
+
+To turn the usage limits off, open **Settings → Appearance** and turn off **Show
+agent usage limits**. Helm then stops asking the hosts. Offline, the panel shows
+sample values, marked **Sample data**.
 
 ## Session status
 

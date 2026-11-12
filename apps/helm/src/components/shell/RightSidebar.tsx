@@ -3,6 +3,7 @@ import { offline, useServer } from '@helm/client'
 import { isStreaming, useChromeTheme, useHelm, type Chat } from '../../state/store'
 import { sessionTone } from '../../views/session/SessionView'
 import { Badge, Icon, Meter, StatusDot } from '@helm/ui'
+import { UsageTicker } from './UsageTicker'
 import s from './RightSidebar.module.css'
 
 const { useAgentRuns } = offline
@@ -131,17 +132,7 @@ export function RightSidebar() {
         </Section>
       </div>
 
-      <footer className={s.footer}>
-        <div className={s.telemetryRow}>
-          <span>Context window</span>
-          <span className={s.telemetryValue}>42.8k / 200k</span>
-        </div>
-        <Meter value={21} segments={30} />
-        <div className={s.telemetryRow}>
-          <span>Tokens today</span>
-          <span className={s.telemetryValue}>1.24M</span>
-        </div>
-      </footer>
+      <UsageTicker />
     </aside>
   )
 }

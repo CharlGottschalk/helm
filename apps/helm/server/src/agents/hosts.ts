@@ -2,11 +2,13 @@
 // Helm never runs a model. A hand-off starts the host CLI interactively in a
 // workspace terminal, so TDT's hooks (capture, constitution) apply as usual.
 import type { HelmConfig, HostId } from '../config.js'
+import { claudeStatusLine } from '../usage.js'
 
 export interface HostLaunch {
   command: string
   args: string[]
   title: string
+  env?: Record<string, string>
 }
 
 export interface HostAdapter {
@@ -27,12 +29,12 @@ export function hostAdapters(config: HelmConfig): Record<HostId, HostAdapter> {
     id,
     label,
     skillSigil: sigil,
-    interactive: (prompt) => ({
-      command: config.hosts[id],
+    interactive: (prompt) => {
+      // Claude sessions get Helm's status line, which reports usage limits (usage.ts) and still prints the user's own.
+      const extra = id === 'claude' ? claudeStatusLine() : { args: [], env: {} }
       // Both CLIs accept an initial prompt as a positional argument and stay interactive.
-      args: prompt ? [prompt] : [],
-      title: label,
-    }),
+      return { command: config.hosts[id], args: [...extra.args, ...(prompt ? [prompt] : [])], title: label, env: extra.env }
+    },
     skill: (name, args) => `${sigil}${name}${args ? ` ${args}` : ''}`,
   })
   return {

@@ -8,3 +8,4 @@ vite.config.ts.timestamp-*
 # copied from packages/sdk/docs at build time for the published package
 apps/helm/contracts/
 *.tgz
+/graphify-out/

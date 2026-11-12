@@ -53,7 +53,7 @@ export class Orchestrator {
     return this.launch(ws, session.id, adapter.interactive(prompt))
   }
 
-  private async launch(ws: WorkspaceEntry, sessionId: string, launch: { command: string; args: string[]; title: string }) {
+  private async launch(ws: WorkspaceEntry, sessionId: string, launch: { command: string; args: string[]; title: string; env?: Record<string, string> }) {
     try {
       const terminal = await this.terminals.spawn({
         workspaceId: ws.id,
@@ -61,6 +61,7 @@ export class Orchestrator {
         command: launch.command,
         args: launch.args,
         title: launch.title,
+        env: launch.env,
       })
       this.sessions.update(sessionId, { terminalId: terminal.id, status: 'running' })
     } catch (error) {
