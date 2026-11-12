@@ -130,6 +130,60 @@ export async function brainGraph(call: Call, workspaceId: string, limit = 2000, 
   return graph
 }
 
+/** One file of tdt_project_graph (TDT 0.1.15); `id` is the repo-relative path. */
+export interface TdtProjectGraphNode { id: string; kind: 'code' | 'instruction' | 'doc'; symbols: string[]; symbols_total: number }
+export interface TdtProjectGraphLink { source: string; target: string; relation: string; confidence: 'EXTRACTED' | 'INFERRED' }
+export interface TdtProjectGraph {
+  status: 'graph' | 'no_graph'
+  revision: string
+  schema_version: number | null
+  graphify_version: string | null
+  built_at: string | null
+  built_at_commit: string | null
+  code_only: boolean | null
+  hook_installed: boolean | null
+  nodes: TdtProjectGraphNode[]
+  links: TdtProjectGraphLink[]
+  nodes_total: number
+  links_total: number
+}
+
+const projectGraphCache = new Map<string, TdtProjectGraph>()
+
+/**
+ * A linked project's file graph (tdt_project_graph, built by graphify through TDT), all
+ * pages. Like brainGraph: the same object while the revision is unchanged, and one
+ * restart when a cursor goes stale (retry "reread"). `no_graph` comes back as-is.
+ */
+export async function projectGraph(call: Call, workspaceId: string, projectId: string, limit = 2000, restarted = false): Promise<TdtProjectGraph> {
+  const key = `${workspaceId}:${projectId}`
+  const nodes: TdtProjectGraphNode[] = []
+  const links: TdtProjectGraphLink[] = []
+  let cursor: string | null | undefined
+  let first: TdtProjectGraph | undefined
+  do {
+    let page: TdtProjectGraph & { next_cursor: string | null }
+    try {
+      page = unwrap(await call<TdtProjectGraph & { next_cursor: string | null }>(workspaceId, 'tdt_project_graph', { id: projectId, limit, ...(cursor ? { cursor } : {}) }))
+    } catch (e) {
+      if (cursor && !restarted && e instanceof TdtError && e.retry === 'reread') return projectGraph(call, workspaceId, projectId, limit, true)
+      throw e
+    }
+    if (!cursor) {
+      const known = projectGraphCache.get(key)
+      if (page.status === 'graph' && known?.revision === page.revision) return known
+      first = page
+    }
+    nodes.push(...(page.nodes ?? []))
+    links.push(...(page.links ?? []))
+    cursor = page.next_cursor
+  } while (cursor)
+  const { next_cursor: _, ...meta } = first as TdtProjectGraph & { next_cursor: string | null }
+  const graph = { ...meta, nodes, links }
+  if (graph.status === 'graph') projectGraphCache.set(key, graph)
+  return graph
+}
+
 export interface Loaded<T> {
   data?: T
   error?: TdtError

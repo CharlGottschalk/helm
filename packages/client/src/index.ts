@@ -4,7 +4,7 @@
 // when no server answers, Helm runs in offline mode on mock data.
 import { useSyncExternalStore } from 'react'
 import type { DbEngine, DbRows, DbWrite, FilesResult, HttpResult, TdtResult } from '@usetdt/helm-sdk'
-import { brainGraph, cached, listProjects, unwrap, useLoad, type Loaded } from './tdt'
+import { brainGraph, cached, projectGraph, listProjects, unwrap, useLoad, type Loaded } from './tdt'
 import { useState } from 'react'
 
 export type ServerStatus = 'connecting' | 'online' | 'offline'
@@ -302,6 +302,9 @@ export class HelmServer {
   }
   brainGraph(workspaceId: string) {
     return brainGraph((ws, name, args) => this.callTool(ws, name, args), workspaceId)
+  }
+  projectGraph(workspaceId: string, projectId: string, limit?: number) {
+    return projectGraph((ws, name, args) => this.callTool(ws, name, args), workspaceId, projectId, limit)
   }
 
   /** TDT tools the workspace's MCP profile exposes, with their read-only hint. */

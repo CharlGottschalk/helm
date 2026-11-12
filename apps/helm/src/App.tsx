@@ -7,6 +7,7 @@ import { RightSidebar } from './components/shell/RightSidebar'
 import { TabBar } from './components/shell/TabBar'
 import { useHelm } from './state/store'
 import { BrainGraph } from './views/graph/BrainGraph'
+import { ProjectGraph } from './views/graph/ProjectGraph'
 import { ChatView } from './views/chat/ChatView'
 import { Dashboard } from './views/dashboard/Dashboard'
 import { DesignSystem } from './views/design/DesignSystem'
@@ -54,6 +55,9 @@ export function App() {
       break
     case 'graph':
       view = <BrainGraph key={state.wsId} />
+      break
+    case 'projectGraph':
+      view = <ProjectGraph key={activeTab.id} projectId={activeTab.refId!} />
       break
     case 'project':
       view = <ProjectView key={activeTab.id} projectId={activeTab.refId!} />
