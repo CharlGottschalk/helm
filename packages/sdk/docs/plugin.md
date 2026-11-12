@@ -13,7 +13,7 @@ or themes. The `"helm"` field of its `package.json` declares them:
     "widgets": ["widgets/workspace-status"],
     "tools": []
   },
-  "devDependencies": { "@usetdt/helm-sdk": "^0.2.0" }
+  "devDependencies": { "@usetdt/helm-sdk": "^0.3.0" }
 }
 ```
 

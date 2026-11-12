@@ -10,5 +10,5 @@
     "themes": ["themes/ember"]
   },
   "scripts": { "validate": "helm-sdk validate" },
-  "devDependencies": { "@usetdt/helm-sdk": "^0.2.0" }
+  "devDependencies": { "@usetdt/helm-sdk": "^0.3.0" }
 }
