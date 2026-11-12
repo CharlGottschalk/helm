@@ -80,6 +80,8 @@ export interface Settings {
   reduceMotion: boolean
   /** where chat hand-offs go */
   host: HostId
+  /** the right rail's 5-hour/weekly usage tickers (task 048); off stops their requests */
+  usageLimits: boolean
 }
 
 interface State {
@@ -161,7 +163,7 @@ const seedChats: Chat[] = [
 
 function initialState(): State {
   const base: State = {
-    settings: { theme: 'hud', scanlines: true, reduceMotion: false, host: 'claude' },
+    settings: { theme: 'hud', scanlines: true, reduceMotion: false, host: 'claude', usageLimits: true },
     wsId: offline.workspaces[0].id,
     tabSets: {},
     leftCollapsed: false,

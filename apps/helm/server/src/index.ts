@@ -24,6 +24,7 @@ import { closeAllMcp, listMcpServers, mcpCall, mcpConfirm, removeMcpServer, save
 import { getWorkspace, looksLikeTdtWorkspace } from './workspaces.js'
 import { addWorkspace, createFolder, installTdt, listFolder, tdtStatus } from './onboarding.js'
 import { launchApp, listApps, removeApp, saveApp } from './apps.js'
+import { usageLimits } from './usage.js'
 
 const config = loadConfig()
 const port = Number(process.env.HELM_PORT ?? config.port)
@@ -173,6 +174,8 @@ route('GET', '/api/apps', async () => listApps())
 route('POST', '/api/apps', async (req) => saveApp(await readJson(req)))
 route('DELETE', '/api/apps/:id', async (_req, p) => removeApp(decodeURIComponent(p.id)))
 route('POST', '/api/apps/:id/launch', async (_req, p) => launchApp(decodeURIComponent(p.id)))
+// Agent usage limits (task 048): percentages and reset times only; `?focus=1` allows an earlier check.
+route('GET', '/api/usage/limits', async (req) => usageLimits(config, new URL(req.url ?? '/', 'http://localhost').searchParams.get('focus') === '1'))
 route('GET', '/api/mcp/servers', async () => listMcpServers())
 route('POST', '/api/mcp/servers', async (req) => saveMcpServer(await readJson(req)))
 route('DELETE', '/api/mcp/servers/:name', async (_req, p) => removeMcpServer(decodeURIComponent(p.name)))

@@ -40,9 +40,25 @@ Helm never sends credentials to the browser, to a plugin or to a workspace.
 | `http.json` | Service profiles for HTTP connections |
 | `mcp.json` | MCP server profiles |
 | `sessions/` | Ended sessions (Helm keeps the last 200) |
+| `usage/` | Helm's Claude status line script and the last usage numbers it saved |
 | `plugins/` | Installed plugins and their approval state |
 
 Helm creates this folder so that only your user account can open it (mode 0700).
+
+## Agent usage limits
+
+To show your plan's usage limits (see [Sessions](sessions.md#usage-limits)), Helm:
+
+- reads the access token of your Claude Code login, from `~/.claude/.credentials.json`
+  or, on macOS, the keychain. Helm only reads it. It never renews, changes or copies
+  the login.
+- sends that token only to Claude's usage service at `api.anthropic.com`.
+- runs `codex app-server` and asks it for the rate limits. Codex uses its own login.
+- keeps the token in the server. The browser receives only percentages and reset
+  times.
+
+To stop all of this, turn off **Show agent usage limits** in **Settings →
+Appearance**.
 
 ## Plugins
 

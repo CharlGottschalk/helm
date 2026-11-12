@@ -113,6 +113,15 @@ function SettingsDialogBody({ section, setSection }: { section: Section; setSect
                     onChange={(v) => actions.updateSettings({ reduceMotion: v })}
                   />
                 </Group>
+
+                <Group label="Agent usage">
+                  <Toggle
+                    label="Show agent usage limits"
+                    hint="The 5-hour and weekly limits of your Claude Code and Codex plans in the sessions rail. Helm asks Claude's usage service with Claude Code's login and asks Codex itself; off stops these checks."
+                    checked={state.settings.usageLimits}
+                    onChange={(v) => actions.updateSettings({ usageLimits: v })}
+                  />
+                </Group>
               </>
             )}
 

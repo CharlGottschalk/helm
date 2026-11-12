@@ -123,6 +123,20 @@ export interface McpServerView {
 export type McpServerInput = Omit<McpServerView, 'hasToken'> & { token?: string }
 
 /** An allowlisted local app (Settings → Local apps); Quick actions launch it by id. */
+/** Agent usage limits (task 048): percent of the plan's window used; resetsAt in epoch ms. */
+export interface UsageWindow {
+  pct: number
+  resetsAt: number | null
+}
+export interface HostUsage {
+  host: HostId
+  state: 'ok' | 'stale' | 'unavailable'
+  reason?: string
+  fiveHour: UsageWindow | null
+  weekly: UsageWindow | null
+  updatedAt: number | null
+}
+
 export interface LocalAppView {
   id: string
   name: string
@@ -366,6 +380,11 @@ export class HelmServer {
   }
   testMcpServer(name: string) {
     return this.request<FilesResult<{ tools: string[] }>>('POST', `/api/mcp/servers/${encodeURIComponent(name)}/test`)
+  }
+
+  /* ── agent usage limits (task 048) ── */
+  usageLimits(focus = false) {
+    return this.request<{ hosts: HostUsage[] }>('GET', `/api/usage/limits${focus ? '?focus=1' : ''}`)
   }
 
   /* ── local apps allowlist (task 045) ── */
