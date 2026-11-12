@@ -1,7 +1,8 @@
 import { Badge, Button, Icon, Meter, Panel, RadialGauge, StatusDot } from '@helm/ui'
 import { cx, initials, relTime } from '../../lib/util'
 import { useHelm } from '../../state/store'
-import { offline, server, useLoad, type Loaded, type Project, type TdtProjectInspection, type TdtProjectRead, type TdtProjectReferences } from '@helm/client'
+import { offline, server, useLoad, type Loaded, type Project, type TdtProjectGraph, type TdtProjectInspection, type TdtProjectRead, type TdtProjectReferences } from '@helm/client'
+import { GRAPHIFY_NOTE, GraphAge, graphHandoffPrompt } from '../graph/ProjectGraph'
 import { MarkdownView } from '../../components/markdown/MarkdownView'
 import { splitFrontmatter } from '../../services/records'
 import s from './ProjectView.module.css'
@@ -53,6 +54,9 @@ export function ProjectView({ projectId }: { projectId: string }) {
           </Button>
           <Button icon="brain" onClick={() => actions.openGraph(p.name)}>
             Show in brain
+          </Button>
+          <Button icon="layers" onClick={() => actions.openProjectGraph(p)}>
+            Project graph
           </Button>
         </div>
       </header>
@@ -159,8 +163,12 @@ const availabilityTone = { available: 'green', 'missing or moved': 'amber', arch
 
 /** A registered TDT project: registration, source inspection and brain references (all read-only). */
 function LiveProjectView({ p }: { p: Project }) {
-  const { ws, actions } = useHelm()
+  const { ws, actions, state } = useHelm()
   const key = `${ws.id}:${p.id}`
+  // One small page tells whether a graph exists; the graph view loads the rest.
+  const graph = useLoad(p.availability === 'available' ? `pgraph-meta:${key}` : undefined, () =>
+    server.tdt<TdtProjectGraph>(ws.id, 'tdt_project_graph', { id: p.id, limit: 1 }))
+  const hasGraph = graph.data?.status === 'graph'
   const read = useLoad(`read:${key}`, () => server.tdt<TdtProjectRead>(ws.id, 'tdt_project_read', { reference: p.id }))
   // TDT refuses inspection of missing/archived locations.
   const inspect = useLoad(p.availability === 'available' ? `inspect:${key}` : undefined, () =>
@@ -193,10 +201,41 @@ function LiveProjectView({ p }: { p: Project }) {
           <Button icon="brain" onClick={() => actions.openGraph(p.name)}>
             Show in brain
           </Button>
+          {hasGraph && (
+            <Button icon="layers" onClick={() => actions.openProjectGraph(p)}>
+              Project graph
+            </Button>
+          )}
         </div>
       </header>
 
       <div className={s.grid}>
+        {/* Only when TDT has tdt_project_graph: older TDT (or any read error) shows nothing here. */}
+        {graph.data && (
+          <Panel title="Project graph" code="P-05" className={s.span2}>
+            <p className={s.muted}>
+              {hasGraph ? (
+                <>
+                  <GraphAge g={graph.data} /> · {graph.data.nodes_total} files, {graph.data.links_total} links
+                </>
+              ) : (
+                'No project graph yet. Generating one hands /tdt-project-graph to an agent, which builds it with graphify on this machine.'
+              )}
+            </p>
+            <div className={s.tags}>
+              {hasGraph && (
+                <Button size="sm" variant="primary" icon="layers" onClick={() => actions.openProjectGraph(p)}>
+                  Open graph
+                </Button>
+              )}
+              <Button size="sm" variant={hasGraph ? 'ghost' : 'primary'} icon="chat" onClick={() => actions.handoff(graphHandoffPrompt(state.settings.host, p.id), p.id)}>
+                {hasGraph ? 'Rebuild graph' : 'Generate graph'}
+              </Button>
+            </div>
+            <p className={s.muted}>{GRAPHIFY_NOTE}</p>
+          </Panel>
+        )}
+
         <Panel title="Registration" code="P-01" className={s.span2}>
           <LoadNote load={read} />
           {read.data && !registration && <p className={s.muted}>The registration note is missing from the brain.</p>}

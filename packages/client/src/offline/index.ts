@@ -2,4 +2,5 @@
 // transport). Apps and widgets read it through `offline` from @helm/client, never by path.
 export * from './mock'
 export * from './graph'
+export { sampleProjectGraph } from './projectGraph'
 export { useAgentRuns } from './useAgentRuns'

@@ -9,7 +9,8 @@
   },
   "scripts": {
     "typecheck": "tsc --noEmit",
-    "check:graph": "tsx test/graph-check.ts"
+    "check:graph": "tsx test/graph-check.ts",
+    "check:project-graph": "tsx test/project-graph-check.ts"
   },
   "dependencies": {
     "@usetdt/helm-sdk": "*"

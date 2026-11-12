@@ -13,6 +13,7 @@ const tabIcon: Record<TabKind, IconName> = {
   terminal: 'keyboard',
   session: 'spark',
   record: 'doc',
+  projectGraph: 'layers',
 }
 
 export function TabBar() {

@@ -380,3 +380,41 @@
 .zoom {
   background: var(--c-chrome);
 }
+/* project graphs: graph age / attribution line, relation legend */
+.footnote {
+  max-width: 520px;
+  padding: var(--sp-1) var(--sp-2);
+  font-size: var(--fs-2xs);
+  color: var(--c-text-2);
+  background: var(--c-chrome);
+  border: 1px solid var(--c-line);
+  border-radius: var(--radius-sm);
+  backdrop-filter: var(--blur-panel);
+}
+.warn {
+  color: var(--c-amber);
+}
+.legendRule {
+  height: 1px;
+  margin: var(--sp-1) 0;
+  background: var(--c-line);
+}
+.legendLine {
+  width: 12px;
+  height: 2px;
+}
+.symbols {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  max-height: 120px;
+  overflow-y: auto;
+  font-family: var(--font-mono);
+  font-size: var(--fs-2xs);
+  color: var(--c-text-2);
+}
+.symbols span {
+  padding: 1px 5px;
+  border: 1px solid var(--c-line);
+  border-radius: var(--radius-sm);
+}
