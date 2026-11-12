@@ -42,6 +42,8 @@ export interface WidgetHost {
   openRecord(ref: { kind: 'knowledge' | 'candidate' | 'scratchpad' | 'project'; path: string; id?: string; title: string }): void
   openSession(id: string, title: string): void
   openDesign(): void
+  /** open a tool tab (built-in or plugin) by type; single-instance tools reuse their tab */
+  openTool(type: string, name: string): void
   openSettings(): void
   /** Helm's Settings, opened on Connections */
   openConnections(): void

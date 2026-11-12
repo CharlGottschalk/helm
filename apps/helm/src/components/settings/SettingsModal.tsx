@@ -1,18 +1,19 @@
 import { useCallback, useEffect, useState, type FormEvent, type ReactNode } from 'react'
 import { Badge, Button, Input, themes, useModal } from '@helm/ui'
-import { server, type DbProfileInput, type DbProfileView, type HttpProfileView, type McpServerView } from '@helm/client'
+import { server, type DbProfileInput, type DbProfileView, type HttpProfileView, type LocalAppView, type McpServerView } from '@helm/client'
 import { DB_ENGINES, validateManifest, type DbEngine } from '@usetdt/helm-sdk'
 import { cx } from '../../lib/util'
 import { chromeOf, useHelm } from '../../state/store'
 import { Icon, type IconName } from '@helm/ui'
 import s from './SettingsModal.module.css'
 
-type Section = 'appearance' | 'plugins' | 'connections' | 'shortcuts'
+type Section = 'appearance' | 'plugins' | 'connections' | 'apps' | 'shortcuts'
 
 const sections: { id: Section; label: string; icon: IconName }[] = [
   { id: 'appearance', label: 'Appearance', icon: 'palette' },
   { id: 'plugins', label: 'Plugins', icon: 'layers' },
   { id: 'connections', label: 'Connections', icon: 'link' },
+  { id: 'apps', label: 'Local apps', icon: 'bolt' },
   { id: 'shortcuts', label: 'Shortcuts', icon: 'keyboard' },
 ]
 
@@ -118,6 +119,8 @@ function SettingsDialogBody({ section, setSection }: { section: Section; setSect
             {section === 'plugins' && <PluginsSection />}
 
             {section === 'connections' && <><ConnectionsSection /><ServicesSection /><McpServersSection /></>}
+
+            {section === 'apps' && <LocalAppsSection />}
 
             {section === 'shortcuts' && (
               <Group label="Keyboard">
@@ -720,6 +723,82 @@ function McpServersSection() {
             <div className={cx(s.pluginActions, s.dbWide)}>
               <Button type="button" size="sm" variant="ghost" onClick={close}>Cancel</Button>
               <Button type="submit" size="sm" variant="primary" disabled={!!busy}>{busy === 'save' ? 'Saving…' : 'Save and test'}</Button>
+            </div>
+          </form>
+        </Group>
+      )}
+    </>
+  )
+}
+
+type AppForm = { id: string; name: string; command: string; args: string }
+const emptyApp = (): AppForm => ({ id: '', name: '', command: '', args: '' })
+const loadApps = () => server.localApps()
+
+/** Local apps allowlist (task 045): Quick actions buttons start only these, by id. */
+function LocalAppsSection() {
+  const { online, data, error, busy, act } = useConnectionList(loadApps)
+  const [form, setForm] = useState<AppForm>()
+  const [editing, setEditing] = useState<string>()
+  const set = (k: keyof AppForm) => (e: { target: { value: string } }) => setForm((f) => f && { ...f, [k]: e.target.value })
+  const close = () => (setForm(undefined), setEditing(undefined))
+  const save = (e: FormEvent) => {
+    e.preventDefault()
+    if (!form) return
+    // one argument per line, so arguments can contain spaces
+    const body: LocalAppView = { id: form.id.trim(), name: form.name.trim(), command: form.command.trim(), args: form.args.split('\n').map((a) => a.trim()).filter(Boolean) }
+    void act('save', () => server.saveLocalApp(body)).then((ok) => ok && close())
+  }
+  if (!online) return <Group label="Local apps" hint="Local apps need the Helm server." />
+  return (
+    <>
+      <Group
+        label="Local apps"
+        hint="Programs a Quick actions button may start on this machine. Buttons name an app here; only the server holds its command, and it runs without a shell, with your permissions. Add only programs you trust."
+      >
+        {error && <p className={s.pluginError} role="alert">{error}</p>}
+        {!data ? (
+          <p className={s.toggleHint}>Loading…</p>
+        ) : !data.apps.length && !form ? (
+          <p className={s.toggleHint}>No local apps yet.</p>
+        ) : (
+          <ul className={s.plugins}>
+            {data.apps.map((a) => (
+              <li key={a.id} className={s.plugin}>
+                <div className={s.pluginHead}>
+                  <span className={s.toggleLabel}>{a.name}</span>
+                  <Badge tone="violet">{a.id}</Badge>
+                </div>
+                <p className={s.toggleHint}>{[a.command, ...a.args].join(' ')}</p>
+                <div className={s.pluginActions}>
+                  <Button size="sm" variant="ghost" disabled={!!busy} onClick={() => (setEditing(a.id), setForm({ id: a.id, name: a.name, command: a.command, args: a.args.join('\n') }))}>Edit</Button>
+                  <Button size="sm" variant="danger" disabled={!!busy} onClick={() => window.confirm(`Remove ${a.name}? Quick actions buttons that start it stop working.`) && void act(`rm:${a.id}`, () => server.removeLocalApp(a.id))}>
+                    Remove
+                  </Button>
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
+        {!form && (
+          <div className={cx(s.pluginActions, s.dbAdd)}>
+            <Button size="sm" variant="primary" icon="plus" onClick={() => (setEditing(undefined), setForm(emptyApp()))}>Add local app</Button>
+          </div>
+        )}
+      </Group>
+      {form && (
+        <Group label={editing ? `Edit ${editing}` : 'Add a local app'} hint="The id is what a button refers to. Give the program by name (found on your PATH) or by full path.">
+          <form className={s.dbForm} onSubmit={save}>
+            <Field label="Id"><Input aria-label="Id" value={form.id} onChange={set('id')} disabled={!!editing} required pattern="[a-z0-9][a-z0-9_\-]{0,63}" placeholder="vscode" /></Field>
+            <Field label="Name"><Input aria-label="Name" value={form.name} onChange={set('name')} maxLength={60} placeholder="VS Code" /></Field>
+            <Field label="Program" wide><Input aria-label="Program" value={form.command} onChange={set('command')} required placeholder="code" /></Field>
+            <div className={cx(s.dbField, s.dbWide)}>
+              <span className={s.toggleHint}>Arguments, one per line</span>
+              <textarea className={s.argsInput} aria-label="Arguments, one per line" value={form.args} onChange={set('args')} rows={3} spellCheck={false} />
+            </div>
+            <div className={cx(s.pluginActions, s.dbWide)}>
+              <Button type="button" size="sm" variant="ghost" onClick={close}>Cancel</Button>
+              <Button type="submit" size="sm" variant="primary" disabled={!!busy}>{busy === 'save' ? 'Saving…' : 'Save'}</Button>
             </div>
           </form>
         </Group>

@@ -33,6 +33,7 @@ export function HelmWidgetHost({ children }: { children: ReactNode }) {
       openRecord: actions.openRecord,
       openSession: actions.openSession,
       openDesign: actions.openDesign,
+      openTool: (type, name) => actions.openTool(type, name, { multi: false }),
       openSettings: actions.openSettings,
       openConnections: actions.openConnections,
     }),

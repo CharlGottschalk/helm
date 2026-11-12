@@ -1,8 +1,8 @@
-// Renders any settings schema (contracts/settings.md): text, select, choice, checkbox, number.
+// Renders any settings schema (contracts/settings.md): text, select, choice, checkbox, number, list.
 import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react'
 import {
-  isDynamic, normalizeOptions, resolveSettings, validateSettings,
-  type OptionsSource, type SettingField, type SettingOption, type SettingValues,
+  defaultsFor, isDynamic, isShown, normalizeOptions, resolveSettings, validateSettings, LIST_MAX,
+  type ItemField, type ListField, type ListItem, type OptionsSource, type SettingField, type SettingOption, type SettingValues,
 } from '@usetdt/helm-sdk'
 import { cx } from '../../lib/util'
 import { Button, Icon } from '@helm/ui'
@@ -39,12 +39,17 @@ export function SettingsForm({ fields, values, onSave, onCancel, resolveOptions 
     <form className={s.form} onSubmit={submit} noValidate>
       {fields.length === 0 && <p className={s.muted}>This item has no settings.</p>}
       {fields.map((f) => {
+        if (!isShown(f, draft)) return null
         const heading = f.group && f.group !== lastGroup ? <div className={s.group}>{f.group}</div> : null
         lastGroup = f.group
         return (
           <div key={f.id}>
             {heading}
-            <Field field={f} value={draft[f.id]} error={errors[f.id]} onChange={(v) => set(f.id, v)} resolveOptions={resolveOptions} />
+            {f.type === 'list' ? (
+              <ListEditor field={f} value={draft[f.id]} errors={errors} onChange={(v) => set(f.id, v)} resolveOptions={resolveOptions} />
+            ) : (
+              <Field field={f} value={draft[f.id]} error={errors[f.id]} onChange={(v) => set(f.id, v)} resolveOptions={resolveOptions} />
+            )}
           </div>
         )
       })}
@@ -83,16 +88,77 @@ function useOptions(source: OptionsSource | undefined, resolver?: OptionsResolve
   return { ...state, retry: () => setAttempt((a) => a + 1) }
 }
 
-function Field({ field: f, value, error, onChange, resolveOptions }: {
-  field: SettingField
+/** Entries of a `list` field: each is a card of its sub-fields, with move up/down and remove. */
+function ListEditor({ field: f, value, errors, onChange, resolveOptions }: {
+  field: ListField
+  value: SettingValues[string] | undefined
+  errors: Record<string, string>
+  onChange: (v: ListItem[]) => void
+  resolveOptions?: OptionsResolver
+}) {
+  const items = Array.isArray(value) ? (value as ListItem[]) : []
+  // stable React keys while entries move, so each card keeps its own option state
+  const next = useRef(0)
+  const [keys, setKeys] = useState<number[]>(() => items.map(() => next.current++))
+  if (keys.length !== items.length) setKeys(items.map((_, i) => keys[i] ?? next.current++))
+  const max = Math.min(f.max ?? LIST_MAX, LIST_MAX)
+  const id = `setting-${f.id}`
+  const update = (list: ListItem[], k: number[]) => (setKeys(k), onChange(list))
+  const move = (i: number, d: -1 | 1) => {
+    const list = [...items], k = [...keys]
+    ;[list[i], list[i + d]] = [list[i + d], list[i]]
+    ;[k[i], k[i + d]] = [k[i + d], k[i]]
+    update(list, k)
+  }
+  const titleField = f.fields.find((x) => x.type === 'text')
+  return (
+    <fieldset className={s.field} aria-describedby={f.help ? `${id}-help` : undefined}>
+      <legend className={s.label}>{f.label}</legend>
+      {f.help && <p id={`${id}-help`} className={s.help}>{f.help}</p>}
+      {errors[f.id] && <p id={id} tabIndex={-1} className={s.error} role="alert">{errors[f.id]}</p>}
+      {!items.length && <p className={s.muted}>Nothing here yet.</p>}
+      <ol className={s.list}>
+        {items.map((item, i) => {
+          const name = (titleField && String(item[titleField.id] ?? '')) || `Entry ${i + 1}`
+          return (
+            <li key={keys[i]} className={s.listItem}>
+              <div className={s.listHead}>
+                <span className={s.listTitle}>{i + 1}. {name}</span>
+                <Button type="button" size="sm" variant="ghost" disabled={i === 0} aria-label={`Move ${name} up`} onClick={() => move(i, -1)}>Up</Button>
+                <Button type="button" size="sm" variant="ghost" disabled={i === items.length - 1} aria-label={`Move ${name} down`} onClick={() => move(i, 1)}>Down</Button>
+                <Button type="button" size="sm" variant="danger" aria-label={`Remove ${name}`}
+                  onClick={() => update(items.filter((_, j) => j !== i), keys.filter((_, j) => j !== i))}>Remove</Button>
+              </div>
+              {f.fields.map((sub) =>
+                isShown(sub, item) ? (
+                  <Field key={sub.id} field={sub} id={`${id}.${i}.${sub.id}`} value={item[sub.id]} error={errors[`${f.id}.${i}.${sub.id}`]} resolveOptions={resolveOptions}
+                    onChange={(v) => onChange(items.map((x, j) => (j === i ? { ...x, [sub.id]: v as ListItem[string] } : x)))} />
+                ) : null,
+              )}
+            </li>
+          )
+        })}
+      </ol>
+      <div>
+        <Button type="button" size="sm" icon="plus" disabled={items.length >= max}
+          onClick={() => update([...items, defaultsFor(f.fields) as ListItem], [...keys, next.current++])}>
+          {f.addLabel ?? 'Add'}
+        </Button>
+      </div>
+    </fieldset>
+  )
+}
+
+function Field({ field: f, id = `setting-${f.id}`, value, error, onChange, resolveOptions }: {
+  field: ItemField
+  id?: string
   value: SettingValues[string] | undefined
   error?: string
   onChange: (v: SettingValues[string]) => void
   resolveOptions?: OptionsResolver
 }) {
-  const id = `setting-${f.id}`
   const describedBy = [f.help && `${id}-help`, error && `${id}-err`].filter(Boolean).join(' ') || undefined
-  const opts = useOptions('options' in f ? f.options : undefined, resolveOptions)
+  const opts = useOptions('options' in f ? f.options : f.type === 'text' ? f.suggestions : undefined, resolveOptions)
   const firstRef = useRef<HTMLInputElement>(null)
 
   // keep a saved value visible even if the dynamic source no longer offers it
@@ -129,8 +195,13 @@ function Field({ field: f, value, error, onChange, resolveOptions }: {
             <textarea id={id} className={cx(s.input, s.textarea)} value={String(value ?? '')} placeholder={f.placeholder}
               maxLength={f.maxLength ?? 2000} aria-invalid={!!error} aria-describedby={describedBy} onChange={(e) => onChange(e.target.value)} />
           ) : (
-            <input id={id} className={s.input} value={String(value ?? '')} placeholder={f.placeholder}
+            <input id={id} className={s.input} value={String(value ?? '')} placeholder={f.placeholder} list={f.suggestions ? `${id}-list` : undefined}
               maxLength={f.maxLength ?? 2000} aria-invalid={!!error} aria-describedby={describedBy} onChange={(e) => onChange(e.target.value)} />
+          )}
+          {f.suggestions && (
+            <datalist id={`${id}-list`}>
+              {options.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+            </datalist>
           )}
           {help}
           {err}

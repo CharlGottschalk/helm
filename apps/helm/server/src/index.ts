@@ -23,6 +23,7 @@ import { finishConnect, setRedirectUri } from './oauth.js'
 import { closeAllMcp, listMcpServers, mcpCall, mcpConfirm, removeMcpServer, saveMcpServer, testMcpServer } from './mcp.js'
 import { getWorkspace, looksLikeTdtWorkspace } from './workspaces.js'
 import { addWorkspace, createFolder, installTdt, listFolder, tdtStatus } from './onboarding.js'
+import { launchApp, listApps, removeApp, saveApp } from './apps.js'
 
 const config = loadConfig()
 const port = Number(process.env.HELM_PORT ?? config.port)
@@ -167,6 +168,11 @@ route('POST', '/api/http/profiles', async (req) => saveHttpProfile(await readJso
 route('DELETE', '/api/http/profiles/:name', async (_req, p) => removeHttpProfile(decodeURIComponent(p.name)))
 // OAuth2 sign-in: the shell opens the returned provider URL; the provider redirects to /oauth/callback below.
 route('POST', '/api/workspaces/:ws/http/profiles/:name/connect', async (_req, p) => connectHttpProfile(getWorkspace(config, p.ws), decodeURIComponent(p.name)))
+// Local apps allowlist (task 045, apps.ts): launch takes an id only, never a command.
+route('GET', '/api/apps', async () => listApps())
+route('POST', '/api/apps', async (req) => saveApp(await readJson(req)))
+route('DELETE', '/api/apps/:id', async (_req, p) => removeApp(decodeURIComponent(p.id)))
+route('POST', '/api/apps/:id/launch', async (_req, p) => launchApp(decodeURIComponent(p.id)))
 route('GET', '/api/mcp/servers', async () => listMcpServers())
 route('POST', '/api/mcp/servers', async (req) => saveMcpServer(await readJson(req)))
 route('DELETE', '/api/mcp/servers/:name', async (_req, p) => removeMcpServer(decodeURIComponent(p.name)))

@@ -1,6 +1,7 @@
 // Tiny grid layout engine for the dashboard: fixed column count, rows grow
 // downward. Moving or resizing an item pushes colliding items down, then the
 // whole layout is compacted upward so there are no gaps.
+import type { SettingValues } from '@usetdt/helm-sdk'
 
 export interface GridItem {
   /** instance id, unique within a layout */
@@ -8,7 +9,7 @@ export interface GridItem {
   /** widget type from the registry; older saved layouts used the id as the type */
   type?: string
   /** per-instance settings values (contracts/settings.md), e.g. { projectId } for a project spotlight */
-  config?: Record<string, string | number | boolean | string[]>
+  config?: SettingValues
   x: number
   y: number
   w: number

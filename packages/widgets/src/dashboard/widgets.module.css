@@ -796,3 +796,28 @@ button.runItem {
 button.runItem:hover .runTitle {
   color: var(--c-cyan);
 }
+/* quick actions (045): status line, unusable buttons, empty state */
+.quickWrap {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+.quickOff,
+.quickOff:hover {
+  cursor: not-allowed;
+  color: var(--c-text-2);
+  border-style: dashed;
+  border-color: var(--c-line);
+  box-shadow: none;
+  transform: none;
+}
+.quickError {
+  font-size: var(--fs-xs);
+  color: var(--c-red);
+}
+.quickEmpty {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--sp-2);
+}
