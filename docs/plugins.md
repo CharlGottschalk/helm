@@ -67,7 +67,7 @@ change. Click **Cancel** to refuse it. There is no option to allow all writes.
 
 ## The software-production plugin
 
-`helm-plugin-software-production` adds tools for TDT software-production tasks:
+`@usetdt/helm-plugin-software-production` adds tools for TDT software-production tasks:
 
 - A **Kanban** tool. Move cards between columns, start a build on a ready card, or see
   the handoff of a card in progress. When you move a card into Doing, Helm asks if you
@@ -79,7 +79,7 @@ named `linear` and `github`. See [Connections](connections.md).
 
 To install it:
 
-1. Run `helm plugin add helm-plugin-software-production`, or enter that name in
+1. Run `helm plugin add @usetdt/helm-plugin-software-production`, or enter that name in
    **System settings** → **Plugins** → **Install**.
 2. Approve and enable it in **System settings** → **Plugins**.
 

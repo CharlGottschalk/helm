@@ -147,7 +147,7 @@ A build starts the TDT software-production build skill for one task:
 `$tdt-software-production-build <project> <task>` in Codex.
 
 Builds start from a plugin, for example the Kanban board of
-`helm-plugin-software-production`. See [Plugins](plugins.md). Before a plugin starts a
+`@usetdt/helm-plugin-software-production`. See [Plugins](plugins.md). Before a plugin starts a
 build or a chat, Helm asks you to allow it. Helm does not read task files itself. The
 build skill reads the task again and refuses work that is not ready.
 
