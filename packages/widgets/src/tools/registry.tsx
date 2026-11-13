@@ -18,7 +18,7 @@ export interface ToolType {
   render: (instance: { id: string }, settings: SettingValues, ctx?: { openSettings: () => void }) => ReactNode
 }
 
-/** Built-in tools (the Kanban ships in helm-plugin-software-production since 022). */
+/** Built-in tools (the Kanban ships in @usetdt/helm-plugin-software-production since 022). */
 export const toolTypes: ToolType[] = [
   {
     type: 'db-explorer',
