@@ -1,6 +1,6 @@
 // Token usage report (task 050): token totals from the transcripts Claude Code and Codex write on
 // this machine, read only. Only numbers, timestamps, model names, session ids and the project
-// folder's name leave this module: never message text, never a path.
+// folder's or repo's name leave this module: never message text, never a path.
 // - Claude: ~/.claude/projects/<slug>/<session>.jsonl (+ <session>/subagents/*.jsonl), assistant
 //   entries' message.usage. One response is written on several lines, and resumed sessions copy
 //   earlier entries, so entries are counted once per message.id + requestId.
@@ -8,7 +8,9 @@
 //   info.last_token_usage (per turn); a repeat of the same cumulative total is not a new turn.
 // Tokens keep the four priced classes apart (fresh input, cache write, cache read, output) and stay
 // per model, so costs can be added later from a price table without re-reading transcripts.
-import { readFileSync, readdirSync, statSync } from 'node:fs'
+// A session's project is the git repo its tool calls touched most (agents often start in a
+// workspace folder and work on repos elsewhere by absolute path), else its folder's name.
+import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs'
 import { homedir } from 'node:os'
 import { basename, dirname, join } from 'node:path'
 import type { HostId } from './config.js'
@@ -30,7 +32,10 @@ interface Entry {
 interface FileResult {
   host: HostId
   session: string
+  /** folder name of the session's cwd, the fallback project */
   project: string
+  /** repo root → paths in it seen in tool calls (+1 for the cwd); internal, never sent */
+  repos: Record<string, number>
   entries: Entry[]
   skipped: number
 }
@@ -64,6 +69,40 @@ const add = (a: Tokens, b: Tokens) => {
 const n = (v: unknown) => (typeof v === 'number' && Number.isFinite(v) && v >= 0 ? v : 0)
 const obj = (v: unknown) => (v && typeof v === 'object' ? (v as Record<string, unknown>) : {})
 const folder = (cwd: unknown) => (typeof cwd === 'string' && cwd ? basename(cwd) : '')
+// absolute POSIX paths in a tool call's input.
+// ponytail: no Windows drive paths; add them if Helm runs agents on Windows.
+const PATH = /(?<![\w.~:-])\/[^\s'"`;|&<>(){}\\,]+/g
+const roots = new Map<string, string>()
+/** The git repo a path is in ('' for none): the nearest folder up with a .git entry (a file in worktrees). */
+function repoOf(p: string): string {
+  const seen: string[] = []
+  let dir = p
+  let root = ''
+  for (;;) {
+    const known = roots.get(dir)
+    if (known !== undefined) {
+      root = known
+      break
+    }
+    seen.push(dir)
+    if (existsSync(join(dir, '.git'))) {
+      root = dir
+      break
+    }
+    const up = dirname(dir)
+    if (up === dir) break
+    dir = up
+  }
+  for (const d of seen) roots.set(d, root)
+  return root
+}
+const hit = (repos: Record<string, number>, path: unknown) => {
+  const r = typeof path === 'string' && path ? repoOf(path) : ''
+  if (r) repos[r] = (repos[r] ?? 0) + 1
+}
+const scan = (repos: Record<string, number>, input: unknown) => {
+  for (const m of JSON.stringify(input ?? '').matchAll(PATH)) hit(repos, m[0])
+}
 const empty = (t: Tokens) => !t.input && !t.cacheWrite && !t.cacheRead && !t.output
 
 /** A local date key, YYYY-MM-DD. */
@@ -75,6 +114,7 @@ export const dayKey = (ms: number) => {
 /** One Claude transcript. `session` is the transcript's id (a subagent's file counts to its parent). */
 export function parseClaude(text: string, session: string, fallbackProject = ''): FileResult {
   const byKey = new Map<string, Entry>()
+  const repos: Record<string, number> = {}
   let project = ''
   let skipped = 0
   for (const line of text.split('\n')) {
@@ -86,9 +126,10 @@ export function parseClaude(text: string, session: string, fallbackProject = '')
       skipped++
       continue
     }
-    if (!project) project = folder(d.cwd)
+    if (!project && (project = folder(d.cwd))) hit(repos, d.cwd)
     if (d.type !== 'assistant') continue
     const m = obj(d.message)
+    if (Array.isArray(m.content)) for (const c of m.content) if (obj(c).type === 'tool_use') scan(repos, obj(c).input)
     const u = obj(m.usage)
     if (!m.usage) continue
     const at = Date.parse(String(d.timestamp))
@@ -103,12 +144,13 @@ export function parseClaude(text: string, session: string, fallbackProject = '')
     // later lines of the same response carry the same or a larger output count
     if (!prev || t.output >= prev.t.output) byKey.set(key, { key, at: prev?.at ?? at, model: String(m.model ?? 'unknown'), t })
   }
-  return { host: 'claude', session, project: project || fallbackProject, entries: [...byKey.values()], skipped }
+  return { host: 'claude', session, project: project || fallbackProject, repos, entries: [...byKey.values()], skipped }
 }
 
 /** One Codex rollout. */
 export function parseCodex(text: string, fallbackSession: string): FileResult {
   const entries: Entry[] = []
+  const repos: Record<string, number> = {}
   let session = ''
   let project = ''
   let model = 'unknown'
@@ -126,10 +168,12 @@ export function parseCodex(text: string, fallbackSession: string): FileResult {
     const p = obj(d.payload)
     if (d.type === 'session_meta') {
       session ||= String(p.id ?? p.session_id ?? '')
-      project ||= folder(p.cwd)
+      if (!project && (project = folder(p.cwd))) hit(repos, p.cwd)
+    } else if (d.type === 'response_item' && /call$/.test(String(p.type))) {
+      scan(repos, p.arguments ?? p.input ?? p.action)
     } else if (d.type === 'turn_context') {
       if (typeof p.model === 'string') model = p.model
-      project ||= folder(p.cwd)
+      if (!project && (project = folder(p.cwd))) hit(repos, p.cwd)
     } else if (d.type === 'event_msg' && p.type === 'token_count') {
       const info = obj(p.info)
       if (!p.info) continue
@@ -147,7 +191,7 @@ export function parseCodex(text: string, fallbackSession: string): FileResult {
       if (!empty(t)) entries.push({ at, model, t })
     }
   }
-  return { host: 'codex', session: session || fallbackSession, project, entries, skipped }
+  return { host: 'codex', session: session || fallbackSession, project, repos, entries, skipped }
 }
 
 /* ── files ── */
@@ -231,10 +275,14 @@ export function usageReport(from: number, to: number): UsageReport {
     days.set(date, { date, claude: zero(), codex: zero() })
   }
   const sessions = new Map<string, UsageSession>()
+  const repos = new Map<string, Record<string, number>>()
   let skipped = 0
   for (const r of results) {
     skipped += r.skipped
     const id = `${r.host}:${r.session}`
+    const sum = repos.get(id) ?? {}
+    repos.set(id, sum)
+    for (const [k, v] of Object.entries(r.repos)) sum[k] = (sum[k] ?? 0) + v
     const start = r.entries.reduce((a, e) => Math.min(a, e.at), Infinity)
     for (const e of r.entries) {
       if (e.key && owner.get(e.key)?.r !== r) continue
@@ -247,6 +295,10 @@ export function usageReport(from: number, to: number): UsageReport {
       const day = days.get(dayKey(e.at))
       if (day) add(day[r.host], e.t)
     }
+  }
+  for (const [id, s] of sessions) {
+    const top = Object.entries(repos.get(id) ?? {}).sort((a, b) => b[1] - a[1])[0]
+    if (top) s.project = basename(top[0])
   }
   return { from, to, days: [...days.values()], sessions: [...sessions.values()], skipped }
 }
