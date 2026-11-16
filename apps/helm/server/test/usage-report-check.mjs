@@ -94,6 +94,38 @@ try {
 
   // cached files: a second call returns the same numbers
   assert.deepEqual(r.usageReport(day.getTime(), day.getTime() + 86_400_000).days, rep.days)
+  // a session started in a non-repo workspace folder that works on repos by absolute path: the repo
+  // touched most names it (Edit paths, a Bash cd, a git worktree's .git file), not the folder.
+  // On the 13th, so the totals above stay as they are.
+  const at13 = (h, m = 0) => new Date(2026, 10, 13, h, m).toISOString()
+  const ws = join(tmp, 'workspace')
+  const helmRepo = join(tmp, 'dev', 'helm')
+  const other = join(tmp, 'dev', 'other')
+  mkdirSync(join(helmRepo, '.git'), { recursive: true })
+  mkdirSync(join(helmRepo, 'src'), { recursive: true })
+  mkdirSync(other, { recursive: true })
+  writeFileSync(join(other, '.git'), 'gitdir: elsewhere\n')
+  mkdirSync(ws, { recursive: true })
+  const wproj = join(process.env.CLAUDE_CONFIG_DIR, 'projects', '-workspace')
+  mkdirSync(wproj, { recursive: true })
+  const tool = (id, ts, name, input) => ({ type: 'assistant', requestId: id, timestamp: ts, cwd: ws, message: { id, model: 'claude-opus-5-5', content: [{ type: 'tool_use', name, input }], usage: { input_tokens: 1, cache_creation_input_tokens: 0, cache_read_input_tokens: 0, output_tokens: 1 } } })
+  writeFileSync(join(wproj, 'sess-w.jsonl'), jl([
+    tool('w1', at13(12), 'Edit', { file_path: join(helmRepo, 'src', 'a.ts'), old_string: SECRET }),
+    tool('w2', at13(12, 1), 'Bash', { command: `cd ${helmRepo} && git status && cat ${join(helmRepo, 'src', 'new.ts')}` }),
+    tool('w3', at13(12, 2), 'Bash', { command: `ls ${other} https://example.com/x` }),
+  ]))
+  // Codex: a function call's arguments point into the other repo
+  writeFileSync(join(cdir, 'rollout-w.jsonl'), jl([
+    { timestamp: at13(13), type: 'session_meta', payload: { id: 'cx-w', cwd: ws } },
+    { timestamp: at13(13), type: 'response_item', payload: { type: 'function_call', name: 'shell', arguments: JSON.stringify({ command: ['bash', '-lc', `cat ${other}/README.md`], workdir: other }) } },
+    tc(at13(13, 1), 10, { input_tokens: 5, cached_input_tokens: 0, output_tokens: 5, total_tokens: 10 }),
+  ]))
+  const d13 = new Date(2026, 10, 13).getTime()
+  const rw = r.usageReport(d13, d13 + 86_400_000)
+  assert.equal(rw.sessions.find((x) => x.id === 'sess-w').project, 'helm', 'repo touched most')
+  assert.equal(rw.sessions.find((x) => x.id === 'cx-w').project, 'other', 'codex call arguments')
+  assert.ok(!JSON.stringify(rw).includes(tmp), 'repo names only, no paths')
+
   console.log('usage report check: ok')
 } finally {
   rmSync(tmp, { recursive: true, force: true })
